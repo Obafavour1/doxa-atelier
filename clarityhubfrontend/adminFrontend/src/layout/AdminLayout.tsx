@@ -44,7 +44,7 @@ const navItems = [
 export const AdminLayout = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    return (localStorage.getItem('admin-theme') as 'light' | 'dark') || 'dark';
+    return (localStorage.getItem('admin-theme') as 'light' | 'dark') || 'light';
   });
   const { data: user, isLoading } = useMe();
   const { mutate: logout } = useLogout();
@@ -70,12 +70,19 @@ export const AdminLayout = () => {
       <aside
         className={`${
           isSidebarOpen ? "w-64" : "w-20"
-        } bg-[var(--bg-sidebar)] border-r border-[var(--border-subtle)] flex flex-col transition-all duration-300 ease-in-out z-50`}
+        } bg-[var(--bg-sidebar)] border-r border-[var(--border-subtle)] flex flex-col transition-all duration-300 ease-in-out z-50 backdrop-blur-xl shadow-[0_24px_70px_rgba(26,10,18,0.08)]`}
       >
-        <div className="h-16 flex items-center px-6 border-b border-[var(--border-subtle)]">
+        <div className="h-20 flex items-center px-5 border-b border-[var(--border-subtle)]">
           <Link to="/dashboard" className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[var(--primary)] flex items-center justify-center text-white font-bold shrink-0">D</div>
-            {isSidebarOpen && <span className="font-bold text-lg tracking-tight">Doxa<span className="text-[var(--primary)] ml-0.5">Admin</span></span>}
+            <div className="w-11 h-11 rounded-xl bg-white border border-[var(--border-subtle)] flex items-center justify-center shrink-0 shadow-[var(--shadow-sm)] overflow-hidden">
+              <img src="/doxa-logo-wide.png" alt="DOXA" className="h-8 w-10 object-contain" />
+            </div>
+            {isSidebarOpen && (
+              <span className="leading-tight">
+                <span className="block font-bold text-base tracking-tight">DOXA Gift Atelier</span>
+                <span className="block text-[10px] font-black uppercase tracking-[0.18em] text-[var(--primary)] mt-0.5">Admin Studio</span>
+              </span>
+            )}
           </Link>
         </div>
 
@@ -95,7 +102,7 @@ export const AdminLayout = () => {
                     className={({ isActive }) =>
                       `flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all group ${
                         isActive
-                          ? "bg-[var(--primary)] text-black font-semibold shadow-[var(--shadow-md)]"
+                          ? "bg-[linear-gradient(135deg,var(--doxa-indigo),var(--doxa-crimson))] text-white font-semibold shadow-[var(--shadow-md)]"
                           : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)]"
                       } ${!isSidebarOpen && "justify-center px-0"}`
                     }
@@ -127,7 +134,7 @@ export const AdminLayout = () => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col relative overflow-hidden bg-[var(--bg-main)]">
         {/* Header */}
-        <header className="h-16 border-b border-[var(--border-subtle)] glass-morphism flex items-center justify-between px-8 z-40 sticky top-0">
+        <header className="h-20 border-b border-[var(--border-subtle)] glass-morphism flex items-center justify-between px-8 z-40 sticky top-0 shadow-[0_18px_42px_rgba(26,10,18,0.05)]">
           <div className="flex items-center gap-6 flex-1">
              <button
               onClick={() => setSidebarOpen(!isSidebarOpen)}
@@ -136,7 +143,7 @@ export const AdminLayout = () => {
               {isSidebarOpen ? <Menu size={20} /> : <ChevronRight size={20} />}
             </button>
 
-            <div className="hidden md:flex items-center gap-3 bg-[var(--surface-hover)] border border-[var(--border-subtle)] px-4 py-1.5 rounded-full w-full max-w-md group focus-within:border-[var(--primary)] transition-all">
+            <div className="hidden md:flex items-center gap-3 bg-white/70 border border-[var(--border-subtle)] px-4 py-2 rounded-full w-full max-w-md group focus-within:border-[var(--primary)] transition-all shadow-[var(--shadow-sm)]">
               <Search size={16} className="text-[var(--text-tertiary)]" />
               <input 
                 type="text" 
@@ -162,7 +169,7 @@ export const AdminLayout = () => {
 
             <div className="h-8 w-[1px] bg-[var(--border-subtle)] mx-2"></div>
 
-            <Link to="/profile" className="flex items-center gap-3 pl-2 pr-1 py-1 rounded-full hover:bg-[var(--surface-hover)] transition-colors group">
+            <Link to="/profile" className="flex items-center gap-3 pl-2 pr-1 py-1 rounded-full border border-transparent hover:border-[var(--border-subtle)] hover:bg-white/60 transition-colors group">
               <div className="flex flex-col items-end hidden sm:flex">
                 <span className="text-xs font-bold leading-none">{user.firstName} {user.lastName}</span>
                 <span className="text-[10px] text-[var(--text-tertiary)] font-bold uppercase tracking-wider mt-1">Super Admin</span>

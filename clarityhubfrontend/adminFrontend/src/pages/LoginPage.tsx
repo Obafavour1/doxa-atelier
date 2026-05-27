@@ -6,7 +6,6 @@ import {
   Lock,
   Loader,
   ArrowRight,
-  LogIn,
   ShieldCheck,
 } from "lucide-react";
 import { useSignIn, useMe } from "../features/auth/api/hooks/hooks";
@@ -42,10 +41,8 @@ const LoginPage = () => {
   const isPending = loginMutation.isPending;
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-24 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Decorative background */}
-      <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.1),transparent_50%)] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-full h-full bg-[radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.05),transparent_50%)] pointer-events-none" />
+    <div className="min-h-screen flex flex-col justify-center py-24 sm:px-6 lg:px-8 relative overflow-hidden bg-[var(--bg-main)]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(55,88,167,0.18),transparent_42%),radial-gradient(circle_at_bottom_left,rgba(148,26,69,0.16),transparent_44%)] pointer-events-none" />
 
       <motion.div
         className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 px-4"
@@ -54,15 +51,15 @@ const LoginPage = () => {
         transition={{ duration: 0.8 }}
       >
         <div className="flex justify-center mb-8">
-          <div className="bg-rose-500/10 p-5 rounded-[2.5rem] border border-rose-500/20 shadow-2xl shadow-rose-500/10">
-            <LogIn className="h-10 w-10 text-rose-500" />
+          <div className="bg-white/80 p-4 rounded-3xl border border-[var(--border-subtle)] shadow-[var(--shadow-md)] backdrop-blur">
+            <img src="/doxa-logo-wide.png" alt="DOXA Gift Atelier" className="h-12 w-36 object-contain" />
           </div>
         </div>
-        <h2 className="text-center text-4xl font-black text-white tracking-tight">
-          Welcome <span className="text-rose-500">Back</span>
+        <h2 className="text-center text-4xl font-black text-[var(--text-primary)] tracking-tight">
+          Welcome <span className="text-[var(--primary)]">Back</span>
         </h2>
-        <p className="mt-2 text-center text-gray-400 font-medium">
-          Enter your credentials to access your account
+        <p className="mt-2 text-center text-[var(--text-secondary)] font-medium">
+          Enter your credentials to access the DOXA admin studio
         </p>
       </motion.div>
 
@@ -72,18 +69,18 @@ const LoginPage = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2 }}
       >
-        <div className="bg-gray-800/40 backdrop-blur-2xl py-10 px-6 shadow-2xl sm:rounded-[3rem] sm:px-12 border border-white/5">
+        <div className="bg-white/82 backdrop-blur-2xl py-10 px-6 shadow-[var(--shadow-lg)] rounded-3xl sm:px-12 border border-[var(--border-subtle)]">
           <form
             onSubmit={handleSubmit(handleLoginSubmit)}
             className="space-y-6"
           >
             <div>
-              <label className="block text-sm font-bold text-gray-300 mb-2">
+              <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">
                 Email Address
               </label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-500 group-focus-within:text-rose-500 transition-colors" />
+                  <Mail className="h-5 w-5 text-[var(--text-tertiary)] group-focus-within:text-[var(--primary)] transition-colors" />
                 </div>
                 <input
                   type="email"
@@ -91,7 +88,7 @@ const LoginPage = () => {
                     required: "Email is required",
                     pattern: { value: /^\S+@\S+$/i, message: "Invalid email" },
                   })}
-                  className="block w-full pl-14 pr-4 py-4 bg-gray-900/50 border border-gray-700/50 rounded-2xl text-white placeholder-gray-500 focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500 transition-all outline-none"
+                  className="block w-full pl-14 pr-4 py-4 bg-[var(--bg-main)] border border-[var(--border-subtle)] rounded-2xl text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] transition-all outline-none"
                   placeholder="you@example.com"
                 />
               </div>
@@ -104,27 +101,27 @@ const LoginPage = () => {
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-bold text-gray-300">
+                <label className="block text-sm font-bold text-[var(--text-primary)]">
                   Password
                 </label>
                 <Link
                   to="/forgot-password"
                   // size={16}
-                  className="text-xs font-bold text-rose-500 hover:text-rose-400 transition-colors"
+                  className="text-xs font-bold text-[var(--primary)] hover:opacity-80 transition-colors"
                 >
                   Forgot Password?
                 </Link>
               </div>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-500 group-focus-within:text-rose-500 transition-colors" />
+                  <Lock className="h-5 w-5 text-[var(--text-tertiary)] group-focus-within:text-[var(--primary)] transition-colors" />
                 </div>
                 <input
                   type="password"
                   {...register("password", {
                     required: "Password is required",
                   })}
-                  className="block w-full pl-14 pr-4 py-4 bg-gray-900/50 border border-gray-700/50 rounded-2xl text-white placeholder-gray-500 focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500 transition-all outline-none"
+                  className="block w-full pl-14 pr-4 py-4 bg-[var(--bg-main)] border border-[var(--border-subtle)] rounded-2xl text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] transition-all outline-none"
                   placeholder="••••••••"
                 />
               </div>
@@ -138,9 +135,9 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full relative flex justify-center items-center py-4 px-6 border border-transparent rounded-2xl text-lg font-black text-white bg-rose-600 hover:bg-rose-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 transition-all shadow-xl shadow-rose-600/20 disabled:opacity-50 group overflow-hidden"
+              className="w-full relative flex justify-center items-center py-4 px-6 border border-transparent rounded-2xl text-lg font-black text-white bg-[linear-gradient(135deg,var(--doxa-indigo),var(--doxa-crimson))] hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary)] transition-all shadow-[var(--shadow-md)] disabled:opacity-50 group overflow-hidden"
             >
-              <div className="absolute inset-0 bg-linear-to-r from-rose-400/0 via-white/10 to-rose-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+              <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/15 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
               {isPending ? (
                 <Loader className="h-6 w-6 animate-spin" />
               ) : (
@@ -153,11 +150,11 @@ const LoginPage = () => {
           </form>
 
           <div className="mt-10 text-center">
-            <p className="text-gray-400 font-medium flex items-center justify-center gap-2">
+            <p className="text-[var(--text-secondary)] font-medium flex items-center justify-center gap-2">
               Don't have an account?{" "}
               <Link
                 to="/signup"
-                className="text-rose-400 font-bold hover:text-rose-300 transition-colors inline-flex items-center gap-1 group"
+                className="text-[var(--primary)] font-bold hover:opacity-80 transition-colors inline-flex items-center gap-1 group"
               >
                 Create one now{" "}
                 <ArrowRight
@@ -171,8 +168,8 @@ const LoginPage = () => {
       </motion.div>
 
       <div className="mt-12 text-center relative z-10">
-        <p className="text-xs text-gray-500 flex items-center justify-center gap-3">
-          <ShieldCheck size={14} className="text-rose-500" />
+        <p className="text-xs text-[var(--text-tertiary)] flex items-center justify-center gap-3">
+          <ShieldCheck size={14} className="text-[var(--primary)]" />
           Encrypted & Secure Login
         </p>
       </div>

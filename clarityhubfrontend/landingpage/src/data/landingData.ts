@@ -152,6 +152,15 @@ export const giftCategories = [
   { id: "gratitude", label: "Gratitude" },
 ];
 
+export const categoryHeroCopy: Record<string, string> = {
+  all: "Browse the complete DOXA gift catalog, then continue to the ecommerce store when you are ready to shop.",
+  celebration: "Birthday, milestone, congratulations, and joy-filled edits for moments worth marking beautifully.",
+  personalized: "Keepsake-led gifts with custom notes, names, memories, and recipient-specific finishing touches.",
+  faith: "Scripture, encouragement, prayerful details, and faith-led gifting for the soul.",
+  wellness: "Soft self-care, beauty, comfort, and care packages for rest, healing, and tenderness.",
+  gratitude: "Refined appreciation gifts for clients, mentors, hosts, friends, teams, and thank-you moments.",
+};
+
 export const occasions = [
   "Birthdays",
   "Thank you",

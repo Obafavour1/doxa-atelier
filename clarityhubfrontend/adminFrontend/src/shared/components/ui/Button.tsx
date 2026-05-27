@@ -13,12 +13,12 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-brand-500 text-white hover:bg-brand-400 shadow-[0_16px_40px_rgba(29,168,111,0.32)]",
+    "bg-[linear-gradient(135deg,var(--doxa-indigo),var(--doxa-crimson))] text-white hover:opacity-95 shadow-[var(--shadow-md)]",
   secondary:
-    "border border-white/10 bg-white/6 text-white hover:bg-white/10",
-  ghost: "text-ink-100 hover:bg-white/6",
+    "border border-[var(--border-subtle)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-[var(--surface-hover)]",
+  ghost: "text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]",
   destructive:
-    "bg-danger-500 text-white hover:bg-[#ee726b] shadow-[0_16px_40px_rgba(223,92,85,0.25)]",
+    "bg-[var(--danger)] text-white hover:opacity-90 shadow-[0_16px_40px_rgba(223,92,85,0.25)]",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

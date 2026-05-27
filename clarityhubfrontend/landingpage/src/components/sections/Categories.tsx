@@ -17,7 +17,7 @@ export function Categories() {
               </span>
               <h3 className="mb-2.5 text-2xl font-bold leading-tight">{item.title}</h3>
               <p className="mb-4 leading-relaxed text-white/80">{item.text}</p>
-              <a className="inline-flex items-center gap-1.5 font-black" href={`#gifts-${item.id}`} aria-label={`Explore ${item.title}`}>
+              <a className="inline-flex items-center gap-1.5 font-black" href={`/gifts?category=${item.id}`} aria-label={`Explore ${item.title}`}>
                 Explore <ChevronRight size={17} />
               </a>
             </div>

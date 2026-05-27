@@ -9,6 +9,8 @@ const iconButton =
 export function Navbar() {
   const scrolled = useScrolled();
   const [menuOpen, setMenuOpen] = useState(false);
+  const isGiftPage = window.location.pathname === "/gifts";
+  const linkHref = (href: string) => (isGiftPage && href.startsWith("#") ? `/${href}` : href);
 
   return (
     <header
@@ -26,7 +28,7 @@ export function Navbar() {
             <a
               className="inline-flex min-h-[38px] items-center rounded-full px-3.5 text-[13px] font-bold text-doxa-noir transition hover:bg-doxa-petal hover:text-doxa-crimson"
               key={item.href}
-              href={item.href}
+              href={linkHref(item.href)}
             >
               {item.label}
             </a>
@@ -40,7 +42,7 @@ export function Navbar() {
           </a>
           <a
             className="hidden min-h-[38px] items-center rounded-full bg-brand-gradient px-4 text-[13px] font-extrabold text-white shadow-brand transition hover:-translate-y-px md:inline-flex"
-            href="#order"
+            href={linkHref("#order")}
           >
             Start request
           </a>
@@ -66,7 +68,7 @@ export function Navbar() {
             <a
               className="rounded-md px-4 py-3 text-sm font-extrabold text-doxa-noir transition hover:bg-doxa-petal hover:text-doxa-crimson"
               key={item.href}
-              href={item.href}
+              href={linkHref(item.href)}
               onClick={() => setMenuOpen(false)}
             >
               {item.label}
@@ -74,7 +76,7 @@ export function Navbar() {
           ))}
           <a
             className="mt-1 inline-flex min-h-[44px] items-center justify-center rounded-full bg-brand-gradient px-4 text-sm font-black text-white shadow-brand"
-            href="#order"
+            href={linkHref("#order")}
             onClick={() => setMenuOpen(false)}
           >
             Start request

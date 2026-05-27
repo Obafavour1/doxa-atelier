@@ -10,23 +10,30 @@ import { Newsletter } from "./components/sections/Newsletter";
 import { Occasions } from "./components/sections/Occasions";
 import { Products } from "./components/sections/Products";
 import { SocialProof } from "./components/sections/SocialProof";
+import { GiftsPage } from "./pages/GiftsPage";
 
 export default function App() {
+  const isGiftPage = window.location.pathname === "/gifts";
+
   return (
     <>
       <Navbar />
-      <main className="overflow-hidden">
-        <Hero />
-        <Categories />
-        <GiftCatalog />
-        <Products />
-        <Occasions />
-        <Benefits />
-        <SocialProof />
-        <Experience />
-        <Editorial />
-        <Newsletter />
-      </main>
+      {isGiftPage ? (
+        <GiftsPage />
+      ) : (
+        <main className="overflow-hidden">
+          <Hero />
+          <Categories />
+          <GiftCatalog />
+          <Products />
+          <Occasions />
+          <Benefits />
+          <SocialProof />
+          <Experience />
+          <Editorial />
+          <Newsletter />
+        </main>
+      )}
       <Footer />
     </>
   );
