@@ -1,0 +1,138 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-muted: var(--primary-muted);
+  --color-bg-main: var(--bg-main);
+  --color-bg-sidebar: var(--bg-sidebar);
+  --color-bg-card: var(--bg-card);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-border-subtle: var(--border-subtle);
+  --color-surface-hover: var(--surface-hover);
+  --color-danger: var(--danger);
+  --color-danger-muted: var(--danger-muted);
+}
+
+:root {
+  --crimson: #941a45;
+  --rose: #b63267;
+  --blush: #f7dce8;
+  --petal: #fff1f6;
+  --indigo: #3758a7;
+  --periwinkle: #b9c8f3;
+  --mist: #f5f7fb;
+  --cream: #fff8f2;
+  --noir: #160812;
+
+  --bg-main: #fff8f2;
+  --bg-sidebar: #fff1f6;
+  --bg-card: #ffffff;
+  --bg-header: rgba(255, 248, 242, 0.86);
+  
+  --border-subtle: rgba(148, 26, 69, 0.14);
+  --border-heavy: rgba(148, 26, 69, 0.26);
+  
+  --text-primary: #160812;
+  --text-secondary: #6f5864;
+  --text-tertiary: #9b7b8b;
+  --text-inverse: #ffffff;
+  
+  --primary: #941a45; 
+  --primary-hover: #7f1238;
+  --primary-muted: rgba(148, 26, 69, 0.11);
+  
+  --danger: #ef4444;
+  --danger-muted: rgba(239, 68, 68, 0.1);
+  
+  --surface-hover: rgba(0, 0, 0, 0.04);
+  
+  --shadow-sm: 0 1px 2px rgba(75, 6, 30, 0.06);
+  --shadow-md: 0 12px 28px rgba(75, 6, 30, 0.1);
+  --shadow-lg: 0 28px 70px rgba(75, 6, 30, 0.16);
+  
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 100px;
+
+  --font-sans: Raleway, Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+[data-theme='dark'] {
+  --bg-main: #160812;
+  --bg-sidebar: #210b19;
+  --bg-card: #210b19;
+  --bg-header: rgba(22, 8, 18, 0.86);
+  
+  --border-subtle: rgba(255, 241, 246, 0.1);
+  --border-heavy: rgba(255, 241, 246, 0.18);
+  
+  --text-primary: #f5f5f5;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #52525b;
+  --text-inverse: #000000;
+  
+  --surface-hover: rgba(255, 255, 255, 0.05);
+  
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+}
+
+@layer base {
+  body {
+    @apply bg-bg-main text-text-primary font-sans antialiased;
+    background:
+      radial-gradient(circle at 8% 10%, rgba(55, 88, 167, 0.08), transparent 28rem),
+      radial-gradient(circle at 92% 4%, rgba(148, 26, 69, 0.12), transparent 26rem),
+      var(--bg-main);
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 400;
+  }
+}
+
+/* Custom Utilities */
+.admin-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.admin-card:hover {
+  border-color: var(--border-heavy);
+  box-shadow: var(--shadow-md);
+}
+
+.admin-btn {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 font-semibold transition-all duration-200 transform-gpu active:scale-[0.98];
+  border-radius: var(--radius-md);
+}
+
+.admin-btn-primary {
+  background-color: var(--primary);
+  color: #000;
+}
+
+.admin-btn-primary:hover {
+  background-color: var(--primary-hover);
+  box-shadow: 0 0 15px rgba(148, 26, 69, 0.2);
+}
+
+.admin-input {
+  @apply w-full bg-surface-hover border border-border-subtle px-4 py-2 opacity-100 transition-all focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none;
+  background-color: var(--surface-hover);
+  border-color: var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.glass-morphism {
+  backdrop-filter: blur(12px);
+  background-color: var(--bg-header);
+}
