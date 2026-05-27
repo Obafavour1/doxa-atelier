@@ -1,0 +1,80 @@
+openapi: 3.0.0
+info:
+  title: Clarity Store API
+  description: E-commerce backend API with modular architecture and advanced security.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000/api/v1
+    description: Local development server
+
+paths:
+  /auth/sign-up:
+    post:
+      summary: Register a new user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [firstName, lastName, email, phone, password, verificationMethod]
+              properties:
+                firstName: { type: string }
+                lastName: { type: string }
+                email: { type: string, format: email }
+                phone: { type: string, example: "+2348012345678" }
+                password: { type: string, minLength: 8 }
+                verificationMethod: { type: string, enum: [email, phone] }
+      responses:
+        '201':
+          description: User created
+        '400':
+          description: Validation error
+
+  /auth/sign-in:
+    post:
+      summary: Login
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        '200':
+          description: Success
+        '401':
+          description: Invalid credentials
+        '403':
+          description: Account locked or unverified
+
+  /products/featured:
+    get:
+      summary: Get featured products
+      tags: [Products]
+      responses:
+        '200':
+          description: List of products
+
+  /products:
+    get:
+      summary: Admin list all products
+      tags: [Products]
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Admin products fetched
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: accessToken

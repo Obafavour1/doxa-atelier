@@ -1,0 +1,8 @@
+docs/
+tests/
+node_modules/
+package-lock.json
+.git/
+*.json
+!package.json
+!nodemonConfig in package.json is handled by nodemon automatically
