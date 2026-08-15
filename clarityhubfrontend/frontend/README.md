@@ -109,7 +109,7 @@ frontend/
 Create a `.env` file in the `frontend` directory:
 
 ```
-VITE_URL=http://localhost:5000/api
+VITE_API_URL=http://localhost:5000/api
 ```
 
 ## 🚀 Deployment
@@ -118,14 +118,14 @@ VITE_URL=http://localhost:5000/api
 
 1. Push your code to GitHub.
 2. Go to [Vercel](https://vercel.com/) and import your repository.
-3. Set the environment variable `VITE_URL` in the Vercel dashboard to your backend API URL.
+3. Set the environment variable `VITE_API_URL` in the Vercel dashboard to your backend API URL (for example, `https://api.example.com/api`).
 4. Click Deploy. Vercel will handle the build and deployment process.
 
 ### Deploying to Netlify
 
 1. Push your code to GitHub.
 2. Go to [Netlify](https://www.netlify.com/) and import your repository.
-3. Set the environment variable `VITE_URL` in the Netlify dashboard to your backend API URL.
+3. Set the environment variable `VITE_API_URL` in the Netlify dashboard to your backend API URL (for example, `https://api.example.com/api`).
 4. Set the build command to `npm run build` and the publish directory to `dist`.
 5. Click Deploy.
 

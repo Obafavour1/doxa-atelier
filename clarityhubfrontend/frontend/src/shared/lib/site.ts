@@ -1,9 +1,11 @@
+import { apiBaseUrl } from "../../api/baseUrl";
+
 export const appConfig = {
   name: "DOXAHub Commerce",
   shortName: "DOXAHub",
   description:
     "A premium commerce workspace for discovery, fast purchasing, and operator-grade merchandising.",
-  apiBaseUrl: import.meta.env.VITE_API_URL || "/api",
+  apiBaseUrl,
   authType: "JWT via httpOnly cookie session",
 } as const;
 

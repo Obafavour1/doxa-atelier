@@ -1,10 +1,9 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
+import { apiBaseUrl } from "./baseUrl";
 import { clearStoredAuth, getStoredToken, setStoredToken } from "./tokenStorage";
 
-const baseURL = import.meta.env.VITE_API_URL || "/api";
-
 const axiosInstance = axios.create({
-  baseURL,
+  baseURL: apiBaseUrl,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
