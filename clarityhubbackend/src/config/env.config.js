@@ -55,6 +55,10 @@ export const env = {
     NGN_PER_USD: Number(process.env.PAYSTACK_NGN_PER_USD),
   },
   CLIENT_URL: process.env.CLIENT_URL || "http://localhost:5174",
+  CORS_ORIGINS: (process.env.CORS_ORIGINS || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
   BREVO: {
     API_KEY: process.env.BREVO_API_KEY,
     SENDER_EMAIL: process.env.BREVO_SENDER_EMAIL,

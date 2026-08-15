@@ -3,9 +3,9 @@ import { ShoppingCart } from "lucide-react";
 import { useRecommendations } from "../api/hooks";
 import { useAddToCart } from "../../cart/api/hooks";
 import { useMe } from "../../auth/api/hooks/hooks";
-import LoadingSpinner from "../../../shared/components/LoadingSpinner";
 import type { IProduct } from "../api/product.types";
 import { useNavigate } from "react-router-dom";
+import ProductCardSkeleton from "./ProductCardSkeleton";
 
 const HomeProduct = () => {
   const { data: recommendations = [], isLoading } = useRecommendations();
@@ -21,7 +21,14 @@ const HomeProduct = () => {
     addToCartMutation.mutate(id);
   };
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4" role="status" aria-label="Loading recommended gifts">
+        {Array.from({ length: 4 }, (_, index) => <ProductCardSkeleton key={index} compact />)}
+        <span className="sr-only">Loading recommended gifts</span>
+      </div>
+    );
+  }
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>

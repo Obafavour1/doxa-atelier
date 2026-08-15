@@ -5,7 +5,7 @@ import HomeProduct from "../features/products/components/HomeProduct";
 import Seo from "../shared/components/Seo";
 import ProductCard from "../features/products/components/ProductCard";
 import { useFeaturedProducts } from "../features/products/api/hooks";
-import LoadingSpinner from "../shared/components/LoadingSpinner";
+import ProductCardSkeleton from "../features/products/components/ProductCardSkeleton";
 
 const tags = [
   { label: "Birthday", slug: "birthday-gifts" },
@@ -104,7 +104,10 @@ const HomePage = () => {
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {featuredProductsLoading ? (
-            <div className="col-span-full"><LoadingSpinner /></div>
+            <>
+              {Array.from({ length: 3 }, (_, index) => <ProductCardSkeleton key={index} />)}
+              <span className="sr-only">Loading featured gifts</span>
+            </>
           ) : featuredProducts.length > 0 ? (
             featuredProducts.slice(0, 3).map((product) => <ProductCard key={product._id} product={product} />)
           ) : (

@@ -18,14 +18,17 @@ const limiter = rateLimit({
 });
 
 // CORS Configuration
-const allowedOrigins = [
+const normalizeOrigin = (origin) => origin?.trim().replace(/\/+$/, "");
+const allowedOrigins = new Set([
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5000",
   "http://localhost:5175",
   "https://claritystore.vercel.app",
+  "https://doxa-atelier.vercel.app",
   env.CLIENT_URL,
-].filter(Boolean);
+  ...env.CORS_ORIGINS,
+].filter(Boolean).map(normalizeOrigin));
 
 app.use(
   cors({
@@ -33,7 +36,7 @@ app.use(
       // Allow requests with no origin (like mobile apps or curl)
       if (!origin) return callback(null, true);
       
-      if (allowedOrigins.includes(origin)) {
+      if (allowedOrigins.has(normalizeOrigin(origin))) {
         callback(null, true);
       } else {
         console.warn(`CORS blocked request from: ${origin}`);

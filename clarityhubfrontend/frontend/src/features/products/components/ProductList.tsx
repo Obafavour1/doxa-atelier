@@ -1,12 +1,19 @@
 import { motion } from "framer-motion";
 import ProductCard from "./ProductCard";
 import { useProducts } from "../api/hooks";
-import LoadingSpinner from "../../../shared/components/LoadingSpinner";
+import ProductCardSkeleton from "./ProductCardSkeleton";
 
 const ProductList = () => {
   const { data: products = [], isLoading } = useProducts();
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading) {
+    return (
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-3 lg:px-8 xl:grid-cols-4" role="status" aria-label="Loading products">
+        {Array.from({ length: 8 }, (_, index) => <ProductCardSkeleton key={index} />)}
+        <span className="sr-only">Loading products</span>
+      </div>
+    );
+  }
 
   return (
     <motion.div

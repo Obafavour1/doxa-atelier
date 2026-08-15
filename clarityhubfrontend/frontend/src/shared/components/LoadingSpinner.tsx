@@ -20,7 +20,7 @@ const LoadingSpinner = ({
         </div>
         <div>
           <p className="text-sm font-semibold text-white">{label}</p>
-          <p className="text-sm text-ink-300">Preparing your workspace state</p>
+          <p className="text-sm text-[var(--text-secondary)]">Preparing your DOXA experience</p>
         </div>
         <span className="sr-only">{label}</span>
       </div>

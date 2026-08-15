@@ -2,7 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Gift, Sparkles } from "lucide-react";
 import ProductCard from "../features/products/components/ProductCard";
-import LoadingSpinner from "../shared/components/LoadingSpinner";
+import ProductCardSkeleton from "../features/products/components/ProductCardSkeleton";
 import { useProductsByCategory } from "../features/products/api/hooks";
 import { categoriesData } from "../shared/lib/data";
 import Seo from "../shared/components/Seo";
@@ -27,7 +27,7 @@ const CategoryPage = () => {
           transition={{ duration: 0.55 }}
         >
             <div><p className="doxa-label text-[var(--primary)]">DOXA gift collection</p><h1 className="mt-2 text-4xl font-medium text-[var(--text-primary)] sm:text-5xl">{title}</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">{categoryDetails?.description || "Thoughtfully selected gifts for meaningful moments."}</p></div>
-            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-[var(--border-subtle)] bg-[var(--cream)] px-4 py-2 text-xs font-semibold text-[var(--primary)]"><Sparkles size={14} /> {products.length} curated {products.length === 1 ? "gift" : "gifts"}</span>
+            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-[var(--border-subtle)] bg-[var(--cream)] px-4 py-2 text-xs font-semibold text-[var(--primary)]"><Sparkles size={14} /> {isLoading ? "Curating gifts…" : `${products.length} curated ${products.length === 1 ? "gift" : "gifts"}`}</span>
           </motion.div>
         </div>
       </section>
@@ -35,7 +35,10 @@ const CategoryPage = () => {
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
 
         {isLoading ? (
-          <LoadingSpinner />
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" role="status" aria-label={`Loading ${title}`}>
+            {Array.from({ length: 8 }, (_, index) => <ProductCardSkeleton key={index} />)}
+            <span className="sr-only">Loading {title}</span>
+          </div>
         ) : (
           <motion.div
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center"
