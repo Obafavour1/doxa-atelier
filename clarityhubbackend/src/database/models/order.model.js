@@ -31,13 +31,32 @@ const orderSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
+    paymentAmount: {
+      type: Number,
+      min: 0,
+    },
+    paymentCurrency: {
+      type: String,
+      uppercase: true,
+      trim: true,
+    },
+    exchangeRate: {
+      type: Number,
+      min: 0,
+    },
     stripeSessionId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    paystackReference: {
       type: String,
       unique: true,
       sparse: true,
     },
     paymentMethod: {
       type: String,
+      enum: ["stripe", "paystack"],
       default: "stripe",
     },
     paymentStatus: {

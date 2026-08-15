@@ -22,6 +22,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5000",
+  "http://localhost:5175",
   "https://claritystore.vercel.app",
   env.CLIENT_URL,
 ].filter(Boolean);
@@ -52,7 +53,7 @@ app.use(cookieParser());
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
-    message: "Clarity Store API is running",
+    message: "DOXA Atelier API is running",
     version: "1.0.0",
   });
 });

@@ -4,6 +4,7 @@ import type {
   AuthSessionResponse,
   ForgotPasswordData,
   OTPVerificationData,
+  ResendOTPData,
   ResetPasswordData,
   SignInData,
   SignUpData,
@@ -24,6 +25,9 @@ export const authApi = {
 
   verifyOTP: (data: OTPVerificationData) =>
     axiosInstance.post<ApiEnvelope<AuthPayload>>("/auth/otp-verification", data),
+
+  resendOTP: (data: ResendOTPData) =>
+    axiosInstance.post<ApiEnvelope<MessagePayload>>("/auth/resend-otp", data),
 
   logout: () => axiosInstance.post<ApiEnvelope<MessagePayload>>("/auth/logout"),
 

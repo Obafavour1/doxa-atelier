@@ -2,14 +2,22 @@ import { motion } from "framer-motion";
 import { ShoppingCart } from "lucide-react";
 import { useRecommendations } from "../api/hooks";
 import { useAddToCart } from "../../cart/api/hooks";
+import { useMe } from "../../auth/api/hooks/hooks";
 import LoadingSpinner from "../../../shared/components/LoadingSpinner";
 import type { IProduct } from "../api/product.types";
+import { useNavigate } from "react-router-dom";
 
 const HomeProduct = () => {
   const { data: recommendations = [], isLoading } = useRecommendations();
+  const { data: user } = useMe();
   const addToCartMutation = useAddToCart();
+  const navigate = useNavigate();
 
   const handleAddCart = (id: string) => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
     addToCartMutation.mutate(id);
   };
 
@@ -28,18 +36,18 @@ const HomeProduct = () => {
             <div className="space-y-3 p-4">
               <div>
                 <h3 className="doxa-h2 line-clamp-1 text-[var(--text-primary)]">{product.name}</h3>
-                <p className="doxa-caption text-[var(--text-secondary)]">Personalized keepsake · Gift-ready</p>
+                <p className="doxa-caption line-clamp-2 text-[var(--text-secondary)]">{product.description}</p>
               </div>
               <div className="flex items-center justify-between gap-3">
                 <p className="text-lg font-semibold text-[var(--primary)]">${product.price.toFixed(2)} CAD</p>
                 <button
-                  disabled={addToCartMutation.isPending}
+                  disabled={Boolean(user) && addToCartMutation.isPending}
                   type="button"
                   onClick={() => handleAddCart(product._id)}
                   className="brand-button min-h-10 px-4 disabled:opacity-50"
                 >
                   <ShoppingCart size={16} />
-                  {addToCartMutation.isPending ? "..." : "Add"}
+                  {user && addToCartMutation.isPending && addToCartMutation.variables === product._id ? "..." : "Add"}
                 </button>
               </div>
             </div>

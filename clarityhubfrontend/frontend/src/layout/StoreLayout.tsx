@@ -9,7 +9,7 @@ export const StoreLayout = () => {
       <div className="relative z-10 flex min-h-screen flex-col">
         <Navbar />
 
-        <main className="grow pt-16">
+        <main className="grow pt-[72px]">
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
             <Outlet />
           </Suspense>

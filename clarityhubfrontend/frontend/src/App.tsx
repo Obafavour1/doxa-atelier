@@ -1,5 +1,5 @@
 import { Suspense, lazy } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
 // Layouts
@@ -7,6 +7,7 @@ import { StoreLayout } from "./layout/StoreLayout";
 
 // Types
 import { useMe } from "./features/auth/api/hooks/hooks";
+import Seo from "./shared/components/Seo";
 
 // Store Pages
 const HomePage = lazy(() => import("./pages/HomePage"));
@@ -25,6 +26,16 @@ const OtpVerificationPage = lazy(() => import("./pages/auth/OtpVerificationPage"
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 
+const RouteSeo = () => {
+  const { pathname } = useLocation();
+  if (pathname === "/" || pathname.startsWith("/category/") || pathname.startsWith("/product/")) return null;
+
+  const isPrivate = ["/cart", "/my-orders", "/profile", "/purchase-success", "/purchase-cancel"].some((route) => pathname.startsWith(route));
+  const isAuth = ["/login", "/signup", "/verify-otp", "/forgot-password", "/password/reset"].some((route) => pathname.startsWith(route));
+  const title = isPrivate ? "Your Account" : isAuth ? "Account Access" : undefined;
+  return <Seo title={title} description="Access your DOXA Atelier account, orders, and personalized gifting experience." noIndex />;
+};
+
 const App = () => {
   const { data: user, isLoading } = useMe();
 
@@ -32,6 +43,7 @@ const App = () => {
 
   return (
     <>
+      <RouteSeo />
       <Suspense fallback={<div className="min-h-screen bg-[#050505] flex items-center justify-center text-white">Loading...</div>}>
         <Routes>
           {/* Store Routes */}

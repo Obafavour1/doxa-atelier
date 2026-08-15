@@ -187,7 +187,7 @@ export const stats = [
 export const testimonials: Testimonial[] = [
   {
     quote:
-      "DOXA Gift Atelier offered a good gift service. My friend was glad to receive the gifts. The delivery service was quick, friendly, and reasonably priced.",
+      "DOXA Atelier offered a good gift service. My friend was glad to receive the gifts. The delivery service was quick, friendly, and reasonably priced.",
     name: "Amara O.",
     detail: "Birthday surprise",
   },

@@ -1,6 +1,6 @@
 <!-- PROJECT LOGO -->
 <p align="center">
-  <h1 align="center">ClarityStore Frontend</h1>
+  <h1 align="center">DOXA Atelier Admin Frontend</h1>
   <p align="center">
     A modern, full-featured e-commerce web application built with React, TypeScript, Zustand, and Vite.
     <br />

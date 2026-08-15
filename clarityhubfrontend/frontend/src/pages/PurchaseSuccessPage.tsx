@@ -1,123 +1,169 @@
-import { ArrowRight, CheckCircle, HandHeart, Loader } from "lucide-react";
-import { useEffect, useState } from "react";
+import axios from "axios";
+import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  Check,
+  CheckCircle2,
+  Clock3,
+  Gift,
+  LoaderCircle,
+  PackageCheck,
+  ReceiptText,
+  RefreshCw,
+  ShieldCheck,
+  ShoppingBag,
+  Sparkles,
+  TriangleAlert,
+} from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useCheckoutSuccess } from "../features/cart/api/hooks";
-import Confetti from "react-confetti";
-import { motion } from "framer-motion";
+
+type ConfirmationState = "verifying" | "success" | "error";
+
+const getErrorMessage = (error: unknown) => {
+  if (axios.isAxiosError(error) && typeof error.response?.data?.message === "string") {
+    return error.response.data.message;
+  }
+  return error instanceof Error ? error.message : "We could not confirm this payment yet.";
+};
 
 const PurchaseSuccessPage = () => {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
-  const checkoutMutation = useCheckoutSuccess();
+  const paystackReference = searchParams.get("reference") || searchParams.get("trxref");
+  const provider = searchParams.get("provider") === "paystack" ? "paystack" : "stripe";
+  const paymentReference = provider === "paystack" ? paystackReference : sessionId;
+  const { data: confirmationData, mutate: verifyPayment } = useCheckoutSuccess();
+  const attemptedReference = useRef<string | null>(null);
+  const [confirmationState, setConfirmationState] = useState<ConfirmationState>("verifying");
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (sessionId) {
-      checkoutMutation.mutate(sessionId, {
-        onError: (err: any) => {
-          setError(err.response?.data?.message || "Failed to confirm purchase");
-        },
-      });
-    } else {
-      setError("No session ID found in the URL");
+  const confirmPayment = useCallback((force = false) => {
+    if (!paymentReference) {
+      setError("No payment reference was found. Return to your orders to check the payment status.");
+      setConfirmationState("error");
+      return;
     }
-  }, [sessionId]);
 
-  if (checkoutMutation.isPending) {
+    const attemptKey = `${provider}:${paymentReference}`;
+    if (!force && attemptedReference.current === attemptKey) return;
+
+    attemptedReference.current = attemptKey;
+    setError(null);
+    setConfirmationState("verifying");
+    verifyPayment(
+      { provider, reference: paymentReference },
+      {
+        onSuccess: (result) => {
+          if (!result?.orderId) {
+            setError("The payment was verified, but the order number was not returned. Please review your orders.");
+            setConfirmationState("error");
+            return;
+          }
+          setConfirmationState("success");
+        },
+        onError: (requestError: unknown) => {
+          setError(getErrorMessage(requestError));
+          setConfirmationState("error");
+        },
+      },
+    );
+  }, [paymentReference, provider, verifyPayment]);
+
+  useEffect(() => {
+    confirmPayment();
+  }, [confirmPayment]);
+
+  if (confirmationState === "verifying") {
     return (
-      <div className="h-screen flex flex-col items-center justify-center gap-4">
-        <Loader className="h-12 w-12 animate-spin text-rose-500" />
-        <p className="text-xl font-bold text-white">
-          Confirming your purchase...
-        </p>
-      </div>
+      <section className="relative grid min-h-[calc(100vh-72px)] place-items-center overflow-hidden px-4 py-16 sm:px-6">
+        <div className="absolute left-[8%] top-[16%] h-64 w-64 rounded-full bg-[var(--periwinkle)]/35 blur-3xl" />
+        <div className="absolute bottom-[10%] right-[8%] h-72 w-72 rounded-full bg-[var(--blush)]/70 blur-3xl" />
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="surface-card relative w-full max-w-lg rounded-2xl p-7 text-center shadow-[var(--shadow-lg)] sm:p-10">
+          <div className="brand-gradient mx-auto grid h-20 w-20 place-items-center rounded-2xl text-white shadow-lg"><LoaderCircle className="h-9 w-9 animate-spin" /></div>
+          <p className="doxa-label mt-7 text-[var(--primary)]">Secure confirmation</p>
+          <h1 className="mt-2 text-3xl font-medium text-[var(--text-primary)]">We’re confirming your payment</h1>
+          <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-[var(--text-secondary)]">Please keep this page open while DOXA Atelier verifies the transaction and prepares your order.</p>
+          <div className="mt-7 flex items-center justify-center gap-2 rounded-xl bg-[var(--cream)] px-4 py-3 text-xs font-semibold text-[var(--text-secondary)]"><ShieldCheck size={16} className="text-[var(--primary)]" /> Protected payment verification</div>
+        </motion.div>
+      </section>
     );
   }
 
-  if (error) {
+  if (confirmationState === "error") {
     return (
-      <div className="h-screen flex flex-col items-center justify-center gap-6 px-4">
-        <div className="bg-red-500/10 p-8 rounded-4xl border border-red-500/20 text-center">
-          <h2 className="text-3xl font-bold text-red-500 mb-2">
-            Something went wrong
-          </h2>
-          <p className="text-gray-400 mb-8">{error}</p>
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 bg-gray-800 text-white px-8 py-3 rounded-xl font-bold hover:bg-gray-700 transition-all"
-          >
-            Go back Home
-            <ArrowRight size={18} />
-          </Link>
-        </div>
-      </div>
+      <section className="relative grid min-h-[calc(100vh-72px)] place-items-center overflow-hidden px-4 py-16 sm:px-6">
+        <div className="absolute left-[5%] top-[12%] h-72 w-72 rounded-full bg-[var(--periwinkle)]/30 blur-3xl" />
+        <div className="absolute bottom-[8%] right-[6%] h-80 w-80 rounded-full bg-[var(--blush)]/70 blur-3xl" />
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="surface-card relative w-full max-w-xl overflow-hidden rounded-2xl shadow-[var(--shadow-lg)]">
+          <div className="brand-gradient px-7 py-8 text-white sm:px-10">
+            <div className="grid h-14 w-14 place-items-center rounded-xl bg-white/15 backdrop-blur"><TriangleAlert size={27} /></div>
+            <p className="doxa-label mt-6 text-white/70">Confirmation needs attention</p>
+            <h1 className="mt-2 text-3xl font-medium">We couldn’t finish confirming your order</h1>
+          </div>
+          <div className="p-7 sm:p-10">
+            <p className="text-sm leading-6 text-[var(--text-secondary)]">Your payment record is not lost. Try confirmation again, or review your orders before attempting another payment.</p>
+            <div className="mt-5 rounded-xl border border-[var(--border-subtle)] bg-[var(--cream)] p-4">
+              <p className="doxa-label text-[var(--text-tertiary)]">Technical detail</p>
+              <p className="mt-2 break-words text-sm font-semibold text-[var(--text-primary)]">{error}</p>
+            </div>
+            <div className="mt-7 grid gap-3 sm:grid-cols-2">
+              <button type="button" onClick={() => confirmPayment(true)} className="brand-button w-full"><RefreshCw size={16} /> Try confirmation again</button>
+              <Link to="/my-orders" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--border-heavy)] bg-white px-5 text-xs font-bold text-[var(--primary)] transition hover:bg-[var(--petal)]"><ReceiptText size={16} /> View my orders</Link>
+            </div>
+          </div>
+        </motion.div>
+      </section>
     );
   }
+
+  const displayOrderId = `DOXA-${confirmationData!.orderId.slice(-8).toUpperCase()}`;
+  const providerName = provider === "paystack" ? "Paystack" : "Stripe";
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-24 relative overflow-hidden">
-      <Confetti
-        width={window.innerWidth}
-        height={window.innerHeight}
-        gravity={0.1}
-        style={{ zIndex: 99 }}
-        numberOfPieces={500}
-        recycle={false}
-      />
+    <section className="relative overflow-hidden px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
+      <div className="absolute -left-20 top-16 h-80 w-80 rounded-full bg-[var(--periwinkle)]/30 blur-3xl" />
+      <div className="absolute -right-16 bottom-8 h-96 w-96 rounded-full bg-[var(--blush)]/75 blur-3xl" />
 
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="max-w-md w-full bg-gray-800/50 backdrop-blur-xl rounded-[3rem] border border-gray-700 shadow-2xl overflow-hidden relative z-10 p-8 sm:p-12 text-center"
-      >
-        <div className="flex justify-center mb-8 relative">
-          <div className="absolute inset-0 bg-rose-500/20 blur-3xl rounded-full" />
-          <CheckCircle className="text-rose-400 w-24 h-24 relative" />
-        </div>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, ease: "easeOut" }} className="relative mx-auto grid w-full max-w-5xl overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-white shadow-[var(--shadow-lg)] lg:grid-cols-[0.92fr_1.08fr]">
+        <div className="brand-gradient relative overflow-hidden p-7 text-white sm:p-10 lg:p-12">
+          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full border border-white/15" />
+          <div className="absolute -right-8 -top-8 h-40 w-40 rounded-full border border-white/15" />
+          <div className="relative">
+            <span className="doxa-label inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-2 text-white backdrop-blur"><Sparkles size={13} /> Payment received</span>
+            <div className="mt-9 grid h-20 w-20 place-items-center rounded-2xl bg-white text-[var(--primary)] shadow-xl"><CheckCircle2 size={42} strokeWidth={1.8} /></div>
+            <h1 className="mt-7 max-w-md text-4xl font-medium leading-tight sm:text-5xl">Thoughtfully chosen. Beautifully on its way.</h1>
+            <p className="mt-5 max-w-md text-sm leading-6 text-white/75">Thank you for choosing DOXA Atelier. Your payment is confirmed and your gift is moving into preparation.</p>
 
-        <h1 className="text-4xl font-black text-white mb-4">Success!</h1>
-
-        <p className="text-gray-400 text-lg mb-8">
-          Thank you for your order. We've received your payment and are
-          preparing your package with care.
-        </p>
-
-        <div className="bg-gray-900/50 rounded-3xl p-6 mb-10 border border-gray-700/50 space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-400">Status</span>
-            <span className="text-xs font-bold bg-rose-500/20 text-rose-400 px-3 py-1 rounded-full uppercase tracking-wider">
-              Confirmed
-            </span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-400">
-              Order Number
-            </span>
-            <span className="text-sm font-bold text-white">
-              #HUB-{Math.floor(Math.random() * 900000) + 100000}
-            </span>
+            <div className="mt-9 space-y-4 border-t border-white/15 pt-7">
+              <div className="flex items-center gap-3"><span className="grid h-8 w-8 place-items-center rounded-full bg-white text-[var(--primary)]"><Check size={15} /></span><div><p className="text-sm font-bold">Payment verified</p><p className="text-xs text-white/60">Completed securely with {providerName}</p></div></div>
+              <div className="flex items-center gap-3"><span className="grid h-8 w-8 place-items-center rounded-full bg-white/15 text-white"><PackageCheck size={15} /></span><div><p className="text-sm font-bold">Order preparation</p><p className="text-xs text-white/60">Our team is preparing your selection</p></div></div>
+              <div className="flex items-center gap-3 opacity-65"><span className="grid h-8 w-8 place-items-center rounded-full border border-white/30"><Clock3 size={14} /></span><div><p className="text-sm font-bold">Delivery updates</p><p className="text-xs text-white/60">Track progress from your orders page</p></div></div>
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-col gap-4">
-          <Link
-            to="/"
-            className="w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-4 px-6 rounded-2xl transition-all shadow-lg shadow-rose-500/20 flex items-center justify-center gap-2 group"
-          >
-            Continue Shopping
-            <ArrowRight
-              size={20}
-              className="group-hover:translate-x-1 transition-transform"
-            />
-          </Link>
+        <div className="flex flex-col justify-center p-7 sm:p-10 lg:p-12">
+          <p className="doxa-label text-[var(--primary)]">Order confirmation</p>
+          <h2 className="mt-2 text-3xl font-medium text-[var(--text-primary)]">Your order is confirmed</h2>
+          <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">Everything is in place. You can review the order and follow its progress from your account.</p>
 
-          <button className="flex items-center justify-center gap-2 text-gray-400 hover:text-white transition-colors py-2 text-sm font-bold">
-            <HandHeart size={18} className="text-pink-500" />
-            Join our loyalty program
-          </button>
+          <div className="mt-7 overflow-hidden rounded-xl border border-[var(--border-subtle)]">
+            <div className="flex items-center justify-between gap-4 bg-[var(--cream)] px-4 py-4 sm:px-5"><span className="flex items-center gap-2 text-xs font-semibold text-[var(--text-secondary)]"><Gift size={15} className="text-[var(--primary)]" /> Order number</span><strong className="text-sm text-[var(--text-primary)]">{displayOrderId}</strong></div>
+            <div className="flex items-center justify-between gap-4 border-t border-[var(--border-subtle)] px-4 py-4 sm:px-5"><span className="flex items-center gap-2 text-xs font-semibold text-[var(--text-secondary)]"><ShieldCheck size={15} className="text-[var(--primary)]" /> Payment method</span><strong className="text-sm text-[var(--text-primary)]">{providerName}</strong></div>
+            {paymentReference && <div className="flex items-center justify-between gap-4 border-t border-[var(--border-subtle)] px-4 py-4 sm:px-5"><span className="flex items-center gap-2 text-xs font-semibold text-[var(--text-secondary)]"><ReceiptText size={15} className="text-[var(--primary)]" /> Reference</span><strong className="max-w-[55%] truncate text-xs text-[var(--text-primary)]">{paymentReference.toUpperCase()}</strong></div>}
+          </div>
+
+          <div className="mt-7 grid gap-3 sm:grid-cols-2">
+            <Link to="/my-orders" className="brand-button w-full"><ShoppingBag size={16} /> View my orders</Link>
+            <Link to="/" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--border-heavy)] bg-white px-5 text-xs font-bold text-[var(--primary)] transition hover:bg-[var(--petal)]">Continue shopping <ArrowRight size={16} /></Link>
+          </div>
+
+          <p className="mt-7 flex items-center justify-center gap-2 text-center text-[10px] leading-4 text-[var(--text-tertiary)]"><ShieldCheck size={13} /> Payment confirmation is securely verified by our server.</p>
         </div>
       </motion.div>
-    </div>
+    </section>
   );
 };
 

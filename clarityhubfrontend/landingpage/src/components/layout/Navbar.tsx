@@ -19,8 +19,8 @@ export function Navbar() {
       }`}
     >
       <nav className="mx-auto grid min-h-[76px] w-container grid-cols-[auto_1fr] items-center gap-4 lg:grid-cols-[auto_1fr_auto]" aria-label="Main navigation">
-        <a className="inline-flex" href="#" aria-label="DOXA Gift Atelier home">
-          <img className="h-12 w-[118px] object-contain object-left md:w-[142px]" src="/assets/logo-wide.png" alt="DOXA Gift Atelier" />
+        <a className="inline-flex" href="#" aria-label="DOXA Atelier home">
+          <img className="h-12 w-[118px] object-contain object-left md:w-[142px]" src="/assets/doxa-atelier-logo-wide.png" alt="DOXA Atelier" />
         </a>
 
         <div className="hidden justify-self-center rounded-full border border-doxa-crimson/15 bg-white/60 p-1 shadow-sm backdrop-blur lg:flex">

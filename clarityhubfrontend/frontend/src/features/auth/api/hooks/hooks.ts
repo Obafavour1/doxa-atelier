@@ -4,6 +4,7 @@ import { authKeys } from "../auth.key";
 import type {
   ForgotPasswordData,
   OTPVerificationData,
+  ResendOTPData,
   ResetPasswordData,
   SignInData,
   SignUpData,
@@ -75,6 +76,12 @@ export const useVerifyOTP = () => {
       queryClient.invalidateQueries({ queryKey: authKeys.all });
       await queryClient.invalidateQueries({ queryKey: authKeys.me() });
     },
+  });
+};
+
+export const useResendOTP = () => {
+  return useMutation({
+    mutationFn: (data: ResendOTPData) => authApi.resendOTP(data),
   });
 };
 

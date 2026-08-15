@@ -27,6 +27,19 @@ export interface CheckoutSessionResponse {
   id: string;
 }
 
+export interface PaystackQuote {
+  baseAmount: number;
+  baseCurrency: "USD";
+  convertedAmount: number;
+  currency: "NGN";
+  exchangeRate: number;
+}
+
+export interface CheckoutSuccessResponse {
+  orderId: string;
+  alreadyProcessed?: boolean;
+}
+
 export interface CartResponse {
   cart: CartItem[];
   subtotal: number;

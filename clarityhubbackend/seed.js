@@ -109,7 +109,7 @@ const seedDatabase = async () => {
 
     console.log("Seeding Settings...");
     await Settings.create({
-      storeName: "Clarity Store",
+      storeName: "DOXA Atelier",
       currency: "USD"
     });
     console.log("- Inserted basic store settings.");

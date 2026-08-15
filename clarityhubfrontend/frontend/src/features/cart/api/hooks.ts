@@ -8,6 +8,7 @@ import type {
   CreateCheckoutSessionPayload,
 } from "./cart.types";
 import { toast } from "react-hot-toast";
+import axios from "axios";
 
 export const useCart = () => {
   return useQuery<CartItem[]>({
@@ -69,8 +70,11 @@ export const useValidateCoupon = () => {
       qc.invalidateQueries({ queryKey: cartKeys.coupon() });
       toast.success("Coupon applied successfully");
     },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.message || "Failed to apply coupon");
+    onError: (err: unknown) => {
+      const message = axios.isAxiosError(err) && typeof err.response?.data?.message === "string"
+        ? err.response.data.message
+        : "Failed to apply coupon";
+      toast.error(message);
     },
   });
 };
@@ -82,12 +86,25 @@ export const useCreateCheckoutSession = () => {
   });
 };
 
+export const usePaystackQuote = (
+  payload: CreateCheckoutSessionPayload,
+  enabled: boolean,
+) => {
+  return useQuery({
+    queryKey: ["paystack-quote", payload],
+    queryFn: () => cartApi.getPaystackQuote(payload).then((res) => res.data.data),
+    enabled,
+    staleTime: 1000 * 60,
+    retry: 1,
+  });
+};
+
 export const useCheckoutSuccess = () => {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: (sessionId: string) =>
-      cartApi.checkoutSuccess(sessionId).then((res) => res.data.data),
+    mutationFn: (payment: { provider: "stripe" | "paystack"; reference: string }) =>
+      cartApi.checkoutSuccess(payment).then((res) => res.data.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: cartKeys.items() });
       qc.invalidateQueries({ queryKey: cartKeys.coupon() });

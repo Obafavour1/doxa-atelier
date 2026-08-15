@@ -11,7 +11,7 @@ export function Hero() {
   return (
     <section className="mx-auto grid min-h-[calc(100vh-76px)] w-container items-center gap-10 py-10 md:py-16 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16">
       <div className="max-w-[690px] animate-reveal">
-        <p className="mb-4 text-[11px] font-extrabold uppercase tracking-[0.12em] text-doxa-crimson">DOXA Gift Atelier</p>
+        <p className="mb-4 text-[11px] font-extrabold uppercase tracking-[0.12em] text-doxa-crimson">DOXA Atelier</p>
         <h1 className="font-display text-[42px] font-bold leading-[1.02] text-doxa-noir md:text-[64px] xl:text-[84px]">
           Luxury gifting, curated for the people you cannot celebrate casually.
         </h1>

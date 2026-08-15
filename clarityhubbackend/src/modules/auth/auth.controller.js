@@ -17,20 +17,17 @@ export const signup = asyncHandler(async (req, res, next) => {
     throw new ErrorHandler("Invalid phone number format. Use +234XXXXXXXXX", 400);
   }
 
-  const existingUser = await User.findOne({
-    $or: [{ email, accountVerified: true }, { phone, accountVerified: true }],
-  });
+  const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
 
   if (existingUser) {
-    throw new ErrorHandler("Phone or Email is already in use", 400);
-  }
+    const duplicateField = existingUser.email === email ? "email" : "phone";
+    const duplicateMessage = existingUser.accountVerified
+      ? `This ${duplicateField} is already attached to an existing account.`
+      : `A pending account already exists with this ${duplicateField}. Please verify that account instead.`;
 
-  const registrationAttempts = await User.find({
-    $or: [{ phone, accountVerified: false }, { email, accountVerified: false }],
-  });
-
-  if (registrationAttempts.length >= 3) {
-    throw new ErrorHandler("Max attempts reached (3). Please try again later.", 400);
+    throw new ErrorHandler(duplicateMessage, 409, "DUPLICATE_SIGNUP_FIELD", {
+      field: duplicateField,
+    });
   }
 
   const user = await User.create({ firstName, lastName, email, password, phone, role });

@@ -5,12 +5,12 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "Clarity Store API",
+      title: "DOXA Atelier API",
       version: "1.0.0",
-      description: "Comprehensive E-commerce API Documentation for Clarity Store",
+      description: "E-commerce API documentation for DOXA Atelier",
       contact: {
-        name: "Clarity Support",
-        email: "support@claritystore.com",
+        name: "DOXA Atelier Support",
+        email: "doxagiftatelier@gmail.com",
       },
     },
     servers: [

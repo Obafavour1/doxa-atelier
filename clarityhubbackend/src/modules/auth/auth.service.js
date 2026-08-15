@@ -61,8 +61,8 @@ export const validatePhoneNumber = (phone) => {
 
 export const sendVerificationCode = async (method, code, name, email, phone) => {
   if (method === "email") {
-    const html = generateEmailTemplate(code);
-    await sendEmail({ email, subject: "Your Verification Code", message: html });
+    const html = generateEmailTemplate(code, name);
+    await sendEmail({ email, subject: "Verify your DOXA Atelier account", message: html });
   } else if (method === "phone") {
     const codeWithSpaces = code.toString().split("").join(" ");
     await twilioClient.calls.create({
@@ -75,26 +75,28 @@ export const sendVerificationCode = async (method, code, name, email, phone) => 
   }
 };
 
-const generateEmailTemplate = (code) => `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
-      <h2 style="color: #4CAF50; text-align: center;">Verification Code</h2>
-      <p style="font-size: 16px; color: #333;">Your verification code is:</p>
+const generateEmailTemplate = (code, name) => `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 28px; border: 1px solid rgba(148,26,69,.16); border-radius: 12px; background-color: #fff8f2;">
+      <p style="font-size: 12px; font-weight: 700; letter-spacing: .08em; color: #941a45; text-align: center;">DOXA ATELIER</p>
+      <h2 style="color: #160812; text-align: center;">Verify your email</h2>
+      <p style="font-size: 16px; color: #6f5864;">Hello ${name || "there"}, your verification code is:</p>
       <div style="text-align: center; margin: 20px 0;">
-        <span style="display: inline-block; font-size: 24px; font-weight: bold; color: #4CAF50; padding: 10px 20px; border: 1px solid #4CAF50; border-radius: 5px; background-color: #e8f5e9;">
+        <span style="display: inline-block; font-size: 28px; font-weight: bold; letter-spacing: .28em; color: #941a45; padding: 14px 20px; border: 1px solid rgba(148,26,69,.24); border-radius: 8px; background-color: #fff1f6;">
           ${code}
         </span>
       </div>
-      <p style="font-size: 14px; color: #666;">This code will expire in 10 minutes.</p>
+      <p style="font-size: 14px; color: #6f5864;">This code expires in 10 minutes. If you did not create a DOXA Atelier account, you can ignore this email.</p>
     </div>
 `;
 
 export const generateResetEmailTemplate = (url) => `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
-      <h2 style="color: #4CAF50; text-align: center;">Password Reset Request</h2>
-      <p style="font-size: 16px; color: #333;">Click the button below to reset your password:</p>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 28px; border: 1px solid rgba(148,26,69,.16); border-radius: 12px; background-color: #fff8f2;">
+      <p style="font-size: 12px; font-weight: 700; letter-spacing: .08em; color: #941a45; text-align: center;">DOXA ATELIER</p>
+      <h2 style="color: #160812; text-align: center;">Reset your password</h2>
+      <p style="font-size: 16px; color: #6f5864;">Use the button below to choose a new password for your DOXA Atelier account.</p>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${url}" style="background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>
+        <a href="${url}" style="background-color: #941a45; color: white; padding: 12px 24px; text-decoration: none; border-radius: 100px; font-weight: bold;">Reset password</a>
       </div>
-      <p style="font-size: 12px; color: #999;">If the button doesn't work, copy and paste this link: ${url}</p>
+      <p style="font-size: 12px; color: #9b7b8b;">If the button does not work, copy and paste this link: ${url}</p>
     </div>
 `;

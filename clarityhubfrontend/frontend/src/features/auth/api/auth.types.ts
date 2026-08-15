@@ -31,6 +31,11 @@ export interface OTPVerificationData {
   otp: string;
 }
 
+export interface ResendOTPData {
+  email: string;
+  verificationMethod: "email" | "phone";
+}
+
 export interface ForgotPasswordData {
   email: string;
 }

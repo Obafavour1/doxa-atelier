@@ -17,6 +17,11 @@ const productionOnlyEnvVars = [
   "CLOUDINARY_API_KEY",
   "CLOUDINARY_API_SECRET",
   "STRIPE_SECRET_KEY",
+  "PAYSTACK_SECRET_KEY",
+  "PAYSTACK_NGN_PER_USD",
+  "BREVO_API_KEY",
+  "BREVO_SENDER_EMAIL",
+  "BREVO_SENDER_NAME",
 ];
 
 const missingEnvVars = [...requiredEnvVars, ...(isProd ? productionOnlyEnvVars : [])].filter(
@@ -44,15 +49,16 @@ export const env = {
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || "sk_test_dummy",
   STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
-  CLIENT_URL: process.env.CLIENT_URL || "http://localhost:5173",
-  SMTP: {
-    HOST: process.env.SMTP_HOST,
-    SERVICE: process.env.SMTP_SERVICE,
-    PORT: process.env.SMTP_PORT,
-    MAIL: process.env.SMTP_MAIL,
+  PAYSTACK: {
+    SECRET_KEY: process.env.PAYSTACK_SECRET_KEY,
+    CURRENCY: (process.env.PAYSTACK_CURRENCY || "NGN").toUpperCase(),
+    NGN_PER_USD: Number(process.env.PAYSTACK_NGN_PER_USD),
+  },
+  CLIENT_URL: process.env.CLIENT_URL || "http://localhost:5174",
+  BREVO: {
     API_KEY: process.env.BREVO_API_KEY,
-    SENDER: process.env.BREVO_SENDER_EMAIL,
-    PASSWORD: process.env.SMTP_PASSWORD,
+    SENDER_EMAIL: process.env.BREVO_SENDER_EMAIL,
+    SENDER_NAME: process.env.BREVO_SENDER_NAME,
   },
   TWILIO: {
     SID: process.env.TWILIO_SID,

@@ -1,8 +1,8 @@
-# Clarity Store API Documentation v1.0
+# DOXA Atelier API Documentation v1.0
 
 ## 🚀 Base URL
 - Local: `http://localhost:5000/api`
-- Production: `https://api.claritystore.com/api` (Placeholder)
+- Production: configure your deployed API domain and append `/api`.
 
 ---
 

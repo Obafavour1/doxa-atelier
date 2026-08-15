@@ -23,6 +23,8 @@ import {
 import { useLogout, useMe } from "../features/auth/api/hooks/hooks";
 import { motion, AnimatePresence } from "framer-motion";
 
+const ADMIN_ROLES = ["admin", "manager", "support"] as const;
+
 const navItems = [
   { group: "General", items: [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -62,7 +64,9 @@ export const AdminLayout = () => {
     </div>
   );
   
-  if (!user || user.role !== "admin") return <Navigate to="/login" replace />;
+  if (!user || !ADMIN_ROLES.includes(user.role as (typeof ADMIN_ROLES)[number])) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] flex overflow-hidden font-sans">
@@ -79,7 +83,7 @@ export const AdminLayout = () => {
             </div>
             {isSidebarOpen && (
               <span className="leading-tight">
-                <span className="block font-bold text-base tracking-tight">DOXA Gift Atelier</span>
+                <span className="block font-bold text-base tracking-tight">DOXA Atelier</span>
                 <span className="block text-[10px] font-black uppercase tracking-[0.18em] text-[var(--primary)] mt-0.5">Admin Studio</span>
               </span>
             )}

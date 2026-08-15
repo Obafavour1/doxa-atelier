@@ -3,9 +3,11 @@
 import axiosInstance from "../../../api/client";
 import type {
   CartItem,
+  CheckoutSuccessResponse,
   CheckoutSessionResponse,
   Coupon,
   CreateCheckoutSessionPayload,
+  PaystackQuote,
 } from "./cart.types";
 
 type ApiEnvelope<T> = {
@@ -29,6 +31,10 @@ export const cartApi = {
       "/payments/create-checkout-session",
       payload,
     ),
-  checkoutSuccess: (sessionId: string) =>
-    axiosInstance.post("/payments/checkout-success", { sessionId }),
+  getPaystackQuote: (payload: CreateCheckoutSessionPayload) =>
+    axiosInstance.post<ApiEnvelope<PaystackQuote>>("/payments/paystack/quote", payload),
+  checkoutSuccess: (payment: { provider: "stripe"; reference: string } | { provider: "paystack"; reference: string }) =>
+    payment.provider === "paystack"
+      ? axiosInstance.post<ApiEnvelope<CheckoutSuccessResponse>>("/payments/paystack/verify", { reference: payment.reference })
+      : axiosInstance.post<ApiEnvelope<CheckoutSuccessResponse>>("/payments/checkout-success", { sessionId: payment.reference }),
 };

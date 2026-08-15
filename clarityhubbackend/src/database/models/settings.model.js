@@ -4,7 +4,7 @@ const storeSettingSchema = new mongoose.Schema(
   {
     storeName: {
       type: String,
-      default: "Clarity Store",
+      default: "DOXA Atelier",
     },
     logo: String,
     contactEmail: String,

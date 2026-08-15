@@ -12,10 +12,16 @@ import { useSignIn, useMe } from "../features/auth/api/hooks/hooks";
 import { toast } from "react-hot-toast";
 import type { SignInData } from "../features/auth/api/auth.types";
 
+const ADMIN_ROLES = ["admin", "manager", "support"] as const;
+
+const getBackendErrorMessage = (error: any) =>
+  error?.response?.data?.message || error?.message || "Invalid credentials";
+
 const LoginPage = () => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<SignInData>();
 
@@ -24,19 +30,63 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleLoginSubmit = async (data: SignInData) => {
-    loginMutation.mutate(data, {
-      onSuccess: () => {
+    const sanitizedData = {
+      email: data.email.trim().toLowerCase(),
+      password: data.password.trim(),
+    };
+
+    if (!sanitizedData.email || !sanitizedData.password) {
+      const message = "Email and password are required.";
+
+      if (!sanitizedData.email) {
+        setError("email", { type: "manual", message: "Email is required" });
+      }
+
+      if (!sanitizedData.password) {
+        setError("password", { type: "manual", message: "Password is required" });
+      }
+
+      console.error("Admin login validation error:", {
+        message,
+        payload: { email: sanitizedData.email },
+      });
+      toast.error(message);
+      return;
+    }
+
+    loginMutation.mutate(sanitizedData, {
+      onSuccess: (response) => {
+        const signedInUser = response.data?.data?.user;
+
+        if (!signedInUser || !ADMIN_ROLES.includes(signedInUser.role as (typeof ADMIN_ROLES)[number])) {
+          localStorage.removeItem("claritystore_access_token");
+          localStorage.removeItem("claritystore_user");
+          console.error("Admin login denied for non-admin role:", {
+            email: sanitizedData.email,
+            role: signedInUser?.role,
+          });
+          toast.error("This account does not have admin access.");
+          return;
+        }
+
         toast.success("Welcome back!");
         navigate("/dashboard");
       },
       onError: (err: any) => {
-        toast.error(err.response?.data?.message || "Invalid credentials");
+        console.error("Admin login request failed:", {
+          status: err?.response?.status,
+          data: err?.response?.data,
+          payload: { email: sanitizedData.email },
+        });
+        toast.error(getBackendErrorMessage(err));
       },
     });
   };
 
   if (checkingMe) return null;
-  if (user) return <Navigate to="/dashboard" />;
+  if (user && ADMIN_ROLES.includes(user.role as (typeof ADMIN_ROLES)[number])) {
+    return <Navigate to="/dashboard" />;
+  }
 
   const isPending = loginMutation.isPending;
 
@@ -52,7 +102,7 @@ const LoginPage = () => {
       >
         <div className="flex justify-center mb-8">
           <div className="bg-white/80 p-4 rounded-3xl border border-[var(--border-subtle)] shadow-[var(--shadow-md)] backdrop-blur">
-            <img src="/doxa-logo-wide.png" alt="DOXA Gift Atelier" className="h-12 w-36 object-contain" />
+            <img src="/doxa-atelier-logo-wide.png" alt="DOXA Atelier" className="h-12 w-36 object-contain" />
           </div>
         </div>
         <h2 className="text-center text-4xl font-black text-[var(--text-primary)] tracking-tight">
@@ -87,6 +137,8 @@ const LoginPage = () => {
                   {...register("email", {
                     required: "Email is required",
                     pattern: { value: /^\S+@\S+$/i, message: "Invalid email" },
+                    validate: (value) =>
+                      value.trim().length > 0 || "Email is required",
                   })}
                   className="block w-full pl-14 pr-4 py-4 bg-[var(--bg-main)] border border-[var(--border-subtle)] rounded-2xl text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] transition-all outline-none"
                   placeholder="you@example.com"
@@ -120,6 +172,8 @@ const LoginPage = () => {
                   type="password"
                   {...register("password", {
                     required: "Password is required",
+                    validate: (value) =>
+                      value.trim().length > 0 || "Password is required",
                   })}
                   className="block w-full pl-14 pr-4 py-4 bg-[var(--bg-main)] border border-[var(--border-subtle)] rounded-2xl text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] transition-all outline-none"
                   placeholder="••••••••"

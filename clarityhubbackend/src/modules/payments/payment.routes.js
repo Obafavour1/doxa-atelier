@@ -58,5 +58,8 @@ router.post("/create-checkout-session", paymentController.createCheckoutSession)
  *         description: Order created successfully.
  */
 router.post("/checkout-success", paymentController.checkoutSuccess);
+router.post("/paystack/quote", paymentController.getPaystackQuote);
+router.post("/paystack/initialize", paymentController.initializePaystackTransaction);
+router.post("/paystack/verify", paymentController.verifyPaystackTransaction);
 
 export default router;

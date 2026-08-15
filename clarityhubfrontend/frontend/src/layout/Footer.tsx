@@ -12,7 +12,7 @@ const Footer = () => {
               <Gift size={20} />
             </span>
             <div>
-              <h2 className="doxa-display text-[var(--text-primary)]">DOXA Gift Atelier</h2>
+              <h2 className="doxa-display text-[var(--text-primary)]">DOXA Atelier</h2>
               <p className="doxa-caption text-[var(--text-secondary)]">Where every gift becomes an experience</p>
             </div>
           </div>

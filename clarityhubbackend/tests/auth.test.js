@@ -33,6 +33,46 @@ describe("Auth Module Integration Tests", () => {
       expect(res.status).toBe(400);
       expect(res.body.success).toBe(false);
     });
+
+    it("should reject sign up when email already exists on a pending account", async () => {
+      await User.create({
+        firstName: "Pending",
+        lastName: "User",
+        email: "pending@example.com",
+        password: "password123",
+        phone: "+2348000000099",
+        accountVerified: false,
+      });
+
+      const res = await request(app).post("/api/auth/sign-up").send({
+        firstName: "John",
+        lastName: "Doe",
+        email: "pending@example.com",
+        phone: "+2348012345678",
+        password: "password123",
+        verificationMethod: "email",
+      });
+
+      expect(res.status).toBe(409);
+      expect(res.body.success).toBe(false);
+      expect(res.body.message).toContain("pending account");
+      expect(res.body.error.code).toBe("DUPLICATE_SIGNUP_FIELD");
+    });
+
+    it("should reject sign up when fields contain only spaces", async () => {
+      const res = await request(app).post("/api/auth/sign-up").send({
+        firstName: "   ",
+        lastName: "Doe",
+        email: "john@example.com",
+        phone: "+2348012345678",
+        password: "password123",
+        verificationMethod: "email",
+      });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.code).toBe("MISSING_FIELDS");
+    });
   });
 
   describe("POST /api/auth/otp-verification", () => {
@@ -93,6 +133,17 @@ describe("Auth Module Integration Tests", () => {
 
       expect(res.status).toBe(403);
       expect(res.body.message).toContain("locked");
+    });
+
+    it("should reject login when email or password is blank after trimming", async () => {
+      const res = await request(app).post("/api/auth/sign-in").send({
+        email: "   ",
+        password: "   ",
+      });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.code).toBe("MISSING_FIELDS");
     });
   });
 

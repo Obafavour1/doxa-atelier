@@ -8,17 +8,30 @@ import {
   ArrowRight,
   User,
   Phone,
-  UserPlus,
+  Gift,
+  PackageCheck,
   Sparkles,
+  Eye,
+  EyeOff,
 } from "lucide-react";
+import { useState } from "react";
 import { useSignUp } from "../features/auth/api/hooks/hooks";
 import { toast } from "react-hot-toast";
 import type { SignUpData } from "../features/auth/api/auth.types";
+
+const getBackendErrorMessage = (error: any) =>
+  error?.response?.data?.message || error?.message || "Failed to create account";
+
+const inputClass =
+  "block h-12 w-full rounded-lg border border-[var(--border-subtle)] bg-white/90 pl-11 pr-4 text-sm text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-tertiary)] focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--primary-muted)]";
+
+const labelClass = "mb-2 block text-sm font-semibold text-[var(--text-primary)]";
 
 const SignUpPage = () => {
   const {
     register,
     handleSubmit,
+    setError,
     setValue,
     watch,
     formState: { errors },
@@ -31,11 +44,54 @@ const SignUpPage = () => {
   const signupMutation = useSignUp();
   const navigate = useNavigate();
   const verificationMethod = watch("verificationMethod");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSignupSubmit = (
     data: SignUpData & { confirmPassword: string },
   ) => {
-    const { confirmPassword, ...signupData } = data;
+    const normalizedData = {
+      ...data,
+      firstName: data.firstName.trim(),
+      lastName: data.lastName.trim(),
+      email: data.email.trim().toLowerCase(),
+      phone: data.phone.trim(),
+      password: data.password.trim(),
+      confirmPassword: data.confirmPassword.trim(),
+    };
+
+    if (
+      !normalizedData.firstName ||
+      !normalizedData.lastName ||
+      !normalizedData.email ||
+      !normalizedData.phone ||
+      !normalizedData.password ||
+      !normalizedData.confirmPassword
+    ) {
+      const message = "Complete every sign up field before submitting.";
+      console.error("Signup validation error:", { message, payload: normalizedData });
+      toast.error(message);
+      return;
+    }
+
+    if (normalizedData.password.length < 8) {
+      const message = "Password must be at least 8 characters long.";
+      setError("password", { type: "manual", message });
+      console.error("Signup validation error:", { message, payload: normalizedData });
+      toast.error(message);
+      return;
+    }
+
+    if (normalizedData.password !== normalizedData.confirmPassword) {
+      const message = "Passwords do not match.";
+      setError("confirmPassword", { type: "manual", message });
+      console.error("Signup validation error:", { message, payload: normalizedData });
+      toast.error(message);
+      return;
+    }
+
+    const { confirmPassword: _confirmPassword, ...signupData } = normalizedData;
+
     signupMutation.mutate(signupData, {
       onSuccess: () => {
         toast.success(
@@ -53,7 +109,12 @@ const SignUpPage = () => {
         });
       },
       onError: (err: any) => {
-        toast.error(err.response?.data?.message || "Failed to create account");
+        console.error("Signup request failed:", {
+          status: err?.response?.status,
+          data: err?.response?.data,
+          payload: signupData,
+        });
+        toast.error(getBackendErrorMessage(err));
       },
     });
   };
@@ -61,36 +122,25 @@ const SignUpPage = () => {
   const isPending = signupMutation.isPending;
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-24 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Decorative background */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(ellipse_at_top,rgba(16,185,129,0.15)_0%,rgba(10,80,60,0.05)_45%,transparent_100%)] pointer-events-none" />
+    <div className="min-h-[calc(100vh-64px)] px-4 py-10 md:px-8">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 xl:grid-cols-[1.08fr_0.92fr] xl:items-stretch">
+        <motion.section
+          className="flex items-center"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55 }}
+        >
+          <div className="surface-card w-full rounded-lg p-5 md:p-8 lg:p-10">
+            <div className="mb-8">
+              <p className="doxa-label text-[var(--primary)]">Create account</p>
+              <h1 className="mt-2 text-3xl font-medium text-[var(--text-primary)] md:text-4xl">
+                Start a personal gifting profile
+              </h1>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
+                Save recipient details, track curated boxes, and verify your account for secure checkout.
+              </p>
+            </div>
 
-      <motion.div
-        className="sm:mx-auto sm:w-full sm:max-w-md relative z-10"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        <div className="flex justify-center mb-6">
-          <div className="bg-rose-500/10 p-4 rounded-3xl border border-rose-500/20">
-            <UserPlus className="h-10 w-10 text-rose-500" />
-          </div>
-        </div>
-        <h2 className="text-center text-4xl font-black text-white tracking-tight">
-          Join <span className="text-rose-500">DOXAHub</span>
-        </h2>
-        <p className="mt-2 text-center text-gray-400 font-medium">
-          Create your account and start shopping sustainable
-        </p>
-      </motion.div>
-
-      <motion.div
-        className="mt-10 sm:mx-auto sm:w-full sm:max-w-xl relative z-10"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-      >
-        <div className="bg-gray-800/50 backdrop-blur-xl py-10 px-6 shadow-2xl sm:rounded-[2.5rem] sm:px-12 border border-gray-700/50">
           <form
             onSubmit={handleSubmit(handleSignupSubmit)}
             className="space-y-6"
@@ -99,16 +149,16 @@ const SignUpPage = () => {
 
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-3">
-                <label className="block text-sm font-bold text-gray-300">
+                <label className="block text-sm font-semibold text-[var(--text-primary)]">
                   Verification Method
                 </label>
-                <span className="text-xs font-medium text-gray-500">
-                  Choose where we send your OTP
+                <span className="text-xs font-medium text-[var(--text-tertiary)]">
+                  OTP delivery
                 </span>
               </div>
 
               <div
-                className="grid grid-cols-2 gap-2 rounded-2xl border border-gray-700 bg-gray-900/60 p-2"
+                className="grid grid-cols-2 gap-2 rounded-lg border border-[var(--border-subtle)] bg-[var(--cream)] p-1.5"
                 role="radiogroup"
                 aria-label="Verification method"
               >
@@ -117,10 +167,10 @@ const SignUpPage = () => {
                   role="radio"
                   aria-checked={verificationMethod === "email"}
                   onClick={() => setValue("verificationMethod", "email")}
-                  className={`flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+                  className={`flex min-h-11 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-bold transition ${
                     verificationMethod === "email"
-                      ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20"
-                      : "text-gray-400 hover:bg-white/5 hover:text-white"
+                      ? "bg-[var(--primary)] text-white shadow-md"
+                      : "text-[var(--text-secondary)] hover:bg-white hover:text-[var(--text-primary)]"
                   }`}
                 >
                   <Mail className="h-4 w-4" />
@@ -130,20 +180,18 @@ const SignUpPage = () => {
                 <button
                   type="button"
                   role="radio"
-                  aria-checked={verificationMethod === "phone"}
-                  onClick={() => setValue("verificationMethod", "phone")}
-                  className={`flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
-                    verificationMethod === "phone"
-                      ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20"
-                      : "text-gray-400 hover:bg-white/5 hover:text-white"
-                  }`}
+                  aria-checked="false"
+                  aria-disabled="true"
+                  disabled
+                  title="Phone verification is currently unavailable"
+                  className="flex min-h-11 cursor-not-allowed items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-[var(--text-tertiary)] opacity-50"
                 >
                   <Phone className="h-4 w-4" />
-                  Phone OTP
+                  Phone OTP (Unavailable)
                 </button>
               </div>
 
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-[var(--text-secondary)]">
                 {verificationMethod === "email"
                   ? "We will send a verification code to your email address."
                   : "We will send a verification code to your phone number."}
@@ -152,46 +200,50 @@ const SignUpPage = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-bold text-gray-300 mb-2">
+                <label className={labelClass}>
                   First Name
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-500" />
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                    <User className="h-4 w-4 text-[var(--text-tertiary)]" />
                   </div>
                   <input
                     {...register("firstName", {
                       required: "First name is required",
+                      validate: (value) =>
+                        value.trim().length > 0 || "First name is required",
                     })}
-                    className="block w-full pl-12 pr-4 py-3 bg-gray-900/50 border border-gray-600 rounded-2xl text-white placeholder-gray-500 focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500 transition-all outline-none"
+                    className={inputClass}
                     placeholder="John"
                   />
                 </div>
                 {errors.firstName && (
-                  <p className="mt-1 text-xs text-red-400 font-medium">
+                  <p className="ml-1 mt-1.5 text-xs font-medium text-[var(--danger)]">
                     {errors.firstName.message}
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-300 mb-2">
+                <label className={labelClass}>
                   Last Name
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-500" />
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                    <User className="h-4 w-4 text-[var(--text-tertiary)]" />
                   </div>
                   <input
                     {...register("lastName", {
                       required: "Last name is required",
+                      validate: (value) =>
+                        value.trim().length > 0 || "Last name is required",
                     })}
-                    className="block w-full pl-12 pr-4 py-3 bg-gray-900/50 border border-gray-600 rounded-2xl text-white placeholder-gray-500 focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500 transition-all outline-none"
+                    className={inputClass}
                     placeholder="Doe"
                   />
                 </div>
                 {errors.lastName && (
-                  <p className="mt-1 text-xs text-red-400 font-medium">
+                  <p className="ml-1 mt-1.5 text-xs font-medium text-[var(--danger)]">
                     {errors.lastName.message}
                   </p>
                 )}
@@ -199,47 +251,53 @@ const SignUpPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-300 mb-2">
+              <label className={labelClass}>
                 Email Address
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-500" />
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                  <Mail className="h-4 w-4 text-[var(--text-tertiary)]" />
                 </div>
                 <input
                   type="email"
                   {...register("email", {
                     required: "Email is required",
                     pattern: { value: /^\S+@\S+$/i, message: "Invalid email" },
+                    validate: (value) =>
+                      value.trim().length > 0 || "Email is required",
                   })}
-                  className="block w-full pl-12 pr-4 py-3 bg-gray-900/50 border border-gray-600 rounded-2xl text-white placeholder-gray-500 focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500 transition-all outline-none"
+                  className={inputClass}
                   placeholder="you@example.com"
                 />
               </div>
               {errors.email && (
-                <p className="mt-1 text-xs text-red-400 font-medium">
+                <p className="ml-1 mt-1.5 text-xs font-medium text-[var(--danger)]">
                   {errors.email.message}
                 </p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-300 mb-2">
+              <label className={labelClass}>
                 Phone Number
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Phone className="h-5 w-5 text-gray-500" />
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                  <Phone className="h-4 w-4 text-[var(--text-tertiary)]" />
                 </div>
                 <input
                   type="tel"
-                  {...register("phone", { required: "Phone is required" })}
-                  className="block w-full pl-12 pr-4 py-3 bg-gray-900/50 border border-gray-600 rounded-2xl text-white placeholder-gray-500 focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500 transition-all outline-none"
+                  {...register("phone", {
+                    required: "Phone is required",
+                    validate: (value) =>
+                      value.trim().length > 0 || "Phone is required",
+                  })}
+                  className={inputClass}
                   placeholder="+234..."
                 />
               </div>
               {errors.phone && (
-                <p className="mt-1 text-xs text-red-400 font-medium">
+                <p className="ml-1 mt-1.5 text-xs font-medium text-[var(--danger)]">
                   {errors.phone.message}
                 </p>
               )}
@@ -249,51 +307,76 @@ const SignUpPage = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-bold text-gray-300 mb-2">
+                <label className={labelClass}>
                   Password
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-500" />
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                    <Lock className="h-4 w-4 text-[var(--text-tertiary)]" />
                   </div>
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     {...register("password", {
                       required: "Password is required",
-                      minLength: { value: 6, message: "Minimum 6 characters" },
+                      minLength: {
+                        value: 8,
+                        message: "Password must be at least 8 characters long",
+                      },
+                      validate: (value) =>
+                        value.trim().length > 0 || "Password is required",
                     })}
-                    className="block w-full pl-12 pr-4 py-3 bg-gray-900/50 border border-gray-600 rounded-2xl text-white placeholder-gray-500 focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500 transition-all outline-none"
+                    className={`${inputClass} pr-12`}
                     placeholder="••••••••"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((visible) => !visible)}
+                    className="absolute inset-y-0 right-0 flex items-center px-4 text-[var(--text-tertiary)] transition hover:text-[var(--text-primary)]"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-pressed={showPassword}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
                 {errors.password && (
-                  <p className="mt-1 text-xs text-red-400 font-medium">
+                  <p className="ml-1 mt-1.5 text-xs font-medium text-[var(--danger)]">
                     {errors.password.message}
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-300 mb-2">
+                <label className={labelClass}>
                   Confirm Password
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-500" />
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                    <Lock className="h-4 w-4 text-[var(--text-tertiary)]" />
                   </div>
                   <input
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"}
                     {...register("confirmPassword", {
                       required: "Please confirm password",
                       validate: (val) =>
-                        val === watch("password") || "Passwords do not match",
+                        val.trim().length === 0
+                          ? "Please confirm password"
+                          : val === watch("password") || "Passwords do not match",
                     })}
-                    className="block w-full pl-12 pr-4 py-3 bg-gray-900/50 border border-gray-600 rounded-2xl text-white placeholder-gray-500 focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500 transition-all outline-none"
+                    className={`${inputClass} pr-12`}
                     placeholder="••••••••"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword((visible) => !visible)}
+                    className="absolute inset-y-0 right-0 flex items-center px-4 text-[var(--text-tertiary)] transition hover:text-[var(--text-primary)]"
+                    aria-label={showConfirmPassword ? "Hide confirmation password" : "Show confirmation password"}
+                    aria-pressed={showConfirmPassword}
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
                 {errors.confirmPassword && (
-                  <p className="mt-1 text-xs text-red-400 font-medium">
+                  <p className="ml-1 mt-1.5 text-xs font-medium text-[var(--danger)]">
                     {errors.confirmPassword.message}
                   </p>
                 )}
@@ -303,41 +386,81 @@ const SignUpPage = () => {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full relative flex justify-center items-center py-4 px-6 border border-transparent rounded-2xl text-lg font-black text-white bg-rose-600 hover:bg-rose-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 transition-all shadow-xl shadow-rose-600/20 disabled:opacity-50 group overflow-hidden"
+              className="brand-button group w-full px-6 text-sm disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <div className="absolute inset-0 bg-linear-to-r from-rose-400/0 via-white/10 to-rose-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
               {isPending ? (
-                <Loader className="h-6 w-6 animate-spin" />
+                <Loader className="h-5 w-5 animate-spin" />
               ) : (
                 <>
-                  Create Account
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  Create account
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-8 text-center">
-            <p className="text-gray-400 font-medium">
-              Already have an account?{" "}
+          <div className="mt-8 border-t border-[var(--border-subtle)] pt-6 text-center">
+            <p className="flex flex-wrap items-center justify-center gap-2 text-sm font-medium text-[var(--text-secondary)]">
+              Already have an account?
               <Link
                 to="/login"
-                className="text-rose-400 font-bold hover:text-rose-300 transition-colors inline-flex items-center gap-1 group"
+                className="group inline-flex items-center gap-1 font-bold text-[var(--primary)] transition hover:text-[var(--primary-hover)]"
               >
-                Login{" "}
+                Login
                 <ArrowRight
                   size={16}
-                  className="group-hover:translate-x-1 transition-transform"
+                  className="transition-transform group-hover:translate-x-1"
                 />
               </Link>
             </p>
           </div>
         </div>
-      </motion.div>
+        </motion.section>
 
-      <div className="mt-8 text-center relative z-10">
-        <p className="text-xs text-gray-500 flex items-center justify-center gap-2">
-          <Sparkles size={12} className="text-rose-500" />
+        <motion.section
+          className="relative min-h-[360px] overflow-hidden rounded-lg border border-[var(--border-subtle)] bg-[var(--noir)] text-white shadow-lg xl:min-h-[760px]"
+          initial={{ opacity: 0, x: 18 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.55, delay: 0.1 }}
+        >
+          <img
+            src="/doxa-personalized-box.jpg"
+            alt="DOXA personalized gift box"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--noir)] via-[var(--noir)]/45 to-transparent" />
+          <div className="relative flex h-full min-h-[360px] flex-col justify-between p-6 md:p-8 xl:min-h-[760px]">
+            <Link to="/" className="inline-flex w-fit items-center gap-3">
+              <span className="grid h-10 w-10 place-items-center rounded-lg brand-gradient text-sm font-bold text-white shadow-md">DG</span>
+              <span className="text-sm font-semibold">DOXA Atelier</span>
+            </Link>
+
+            <div className="space-y-4">
+              <span className="inline-flex w-fit items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-2 doxa-label text-white">
+                <Gift size={14} />
+                Curated gifting
+              </span>
+              <h2 className="max-w-md text-4xl font-medium leading-tight md:text-5xl">
+                Gifts built around people, not templates.
+              </h2>
+              <div className="grid max-w-lg gap-3 sm:grid-cols-2">
+                <div className="rounded-lg border border-white/20 bg-white/10 p-4 backdrop-blur">
+                  <PackageCheck className="mb-4 text-white" size={22} />
+                  <p className="text-sm font-semibold">Track every order from curation to handoff.</p>
+                </div>
+                <div className="rounded-lg border border-white/20 bg-white/10 p-4 backdrop-blur">
+                  <Sparkles className="mb-4 text-white" size={22} />
+                  <p className="text-sm font-semibold">Keep recipient notes ready for the next moment.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.section>
+      </div>
+
+      <div className="mx-auto mt-6 max-w-7xl text-center">
+        <p className="flex items-center justify-center gap-2 text-xs text-[var(--text-secondary)]">
+          <Sparkles size={12} className="text-[var(--primary)]" />
           By joining, you agree to our Terms of Service
         </p>
       </div>

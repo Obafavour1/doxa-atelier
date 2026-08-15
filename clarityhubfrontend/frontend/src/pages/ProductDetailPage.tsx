@@ -3,17 +3,17 @@ import { useParams, Link } from "react-router-dom";
 import { 
   ShoppingCart, 
   ChevronLeft, 
-  Star, 
   ShieldCheck, 
-  Truck, 
   Minus,
   Plus,
-  Heart
+  Gift,
+  PackageCheck,
 } from "lucide-react";
 import { productService } from "../services/product.service";
 import { useAddToCart } from "../features/cart/api/hooks";
 import type { Product } from "../types/api";
 import { toast } from "react-hot-toast";
+import Seo from "../shared/components/Seo";
 
 const ProductDetailPage = () => {
   const { slug } = useParams();
@@ -38,12 +38,17 @@ const ProductDetailPage = () => {
     fetchProduct();
   }, [slug]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (product) {
-      addToCartMutation.mutate(product.id, {
-        onSuccess: () => toast.success("Added to cart"),
-        onError: () => toast.error("Failed to add to cart")
-      });
+      const productId = product._id || product.id;
+      try {
+        for (let count = 0; count < quantity; count += 1) {
+          await addToCartMutation.mutateAsync(productId);
+        }
+        toast.success(`${quantity} ${quantity === 1 ? "item" : "items"} added to your cart`);
+      } catch {
+        toast.error("Failed to add product to cart");
+      }
     }
   };
 
@@ -55,6 +60,7 @@ const ProductDetailPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-12">
+      <Seo title={product.name} description={product.description || `Shop ${product.name}, thoughtfully curated by DOXA Atelier.`} image={product.image} type="product" />
       <Link to="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition-colors">
         <ChevronLeft size={20} /> Back to Products
       </Link>
@@ -63,18 +69,11 @@ const ProductDetailPage = () => {
         {/* Product Image */}
         <div className="space-y-4">
           <div className="aspect-square rounded-3xl overflow-hidden bg-white/5 border border-white/10 group">
-            <img 
-              src={product.image || "https://placehold.co/600x600/png"} 
-              alt={product.name} 
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-            />
-          </div>
-          <div className="grid grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="aspect-square rounded-xl bg-white/5 border border-white/10 overflow-hidden cursor-pointer hover:border-rose-500 transition-colors">
-                <img src={product.image || "https://placehold.co/150x150/png"} alt={`View ${i}`} className="w-full h-full object-cover" />
-              </div>
-            ))}
+            {product.image ? (
+              <img src={product.image} alt={product.name} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            ) : (
+              <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-[var(--petal)] text-[var(--primary)]"><Gift size={42} /><span className="text-sm font-semibold">Image coming soon</span></div>
+            )}
           </div>
         </div>
 
@@ -85,19 +84,12 @@ const ProductDetailPage = () => {
               {product.category}
             </div>
             <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">{product.name}</h1>
-            <div className="flex items-center gap-4 mt-4">
-              <div className="flex text-amber-500">
-                {[1, 2, 3, 4, 5].map(i => <Star key={i} size={18} fill={i <= 4 ? "currentColor" : "none"} />)}
-              </div>
-              <span className="text-gray-400 text-sm">(4.8 • 120 Reviews)</span>
-            </div>
+            <p className="mt-4 text-sm text-[var(--text-secondary)]">Live catalogue item · {product.stock} currently in stock</p>
           </div>
 
           <p className="text-3xl font-bold text-rose-400 tracking-tight">$ {product.price.toFixed(2)}</p>
 
-          <p className="text-gray-400 leading-relaxed text-lg">
-            {product.description || "Experience premium quality and sustainable fashion with this beautifully crafted piece. Designed for both comfort and style, it features eco-friendly materials that feel great and last long."}
-          </p>
+          <p className="text-gray-400 leading-relaxed text-lg">{product.description}</p>
 
           <div className="space-y-6 pt-4 border-t border-white/10">
             <div className="flex items-center gap-6">
@@ -110,8 +102,9 @@ const ProductDetailPage = () => {
                 </button>
                 <span className="w-12 text-center font-bold text-xl">{quantity}</span>
                 <button 
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="p-3 text-gray-400 hover:text-white transition-colors"
+                  onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                  disabled={quantity >= product.stock}
+                  className="p-3 text-gray-400 hover:text-white transition-colors disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <Plus size={20} />
                 </button>
@@ -125,24 +118,21 @@ const ProductDetailPage = () => {
                 <ShoppingCart size={24} /> {addToCartMutation.isPending ? "Adding..." : "Add to Cart"}
               </button>
 
-              <button className="p-4 rounded-2xl bg-white/5 border border-white/10 text-gray-400 hover:text-rose-500 transition-all">
-                <Heart size={24} />
-              </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6">
               <div className="flex items-center gap-3 p-4 rounded-2xl bg-white/5 border border-white/5">
                 <ShieldCheck size={24} className="text-rose-500" />
                 <div className="text-left">
-                  <p className="text-sm font-bold">2 Year Warranty</p>
-                  <p className="text-[10px] text-gray-400">Full protection included</p>
+                  <p className="text-sm font-bold">Secure checkout</p>
+                  <p className="text-[10px] text-gray-400">Choose Stripe or Paystack</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 p-4 rounded-2xl bg-white/5 border border-white/5">
-                <Truck size={24} className="text-rose-500" />
+                <PackageCheck size={24} className="text-rose-500" />
                 <div className="text-left">
-                  <p className="text-sm font-bold">Free Shipping</p>
-                  <p className="text-[10px] text-gray-400">On all orders over $100</p>
+                  <p className="text-sm font-bold">Live availability</p>
+                  <p className="text-[10px] text-gray-400">{product.stock} available to order</p>
                 </div>
               </div>
             </div>

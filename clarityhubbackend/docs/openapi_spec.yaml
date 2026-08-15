@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: Clarity Store API
+  title: DOXA Atelier API
   description: E-commerce backend API with modular architecture and advanced security.
   version: 1.0.0
 servers:

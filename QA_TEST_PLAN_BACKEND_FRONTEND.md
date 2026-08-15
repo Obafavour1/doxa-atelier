@@ -1,4 +1,4 @@
-# Clarity Store Test Plan (Backend + Frontend)
+# DOXA Atelier Test Plan (Backend + Frontend)
 
 ## 1. Purpose
 This document defines the tests that should be carried out across the backend and frontend, separated by concern, with priorities and recommended automation type.

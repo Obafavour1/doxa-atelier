@@ -1,9 +1,20 @@
 import { ArrowRight, Gift, Heart, PackageCheck, Sparkles, Star, Truck } from "lucide-react";
 import { Link } from "react-router-dom";
-import { ProductData, categoriesData } from "../shared/lib/data";
+import { categoriesData } from "../shared/lib/data";
 import HomeProduct from "../features/products/components/HomeProduct";
+import Seo from "../shared/components/Seo";
+import ProductCard from "../features/products/components/ProductCard";
+import { useFeaturedProducts } from "../features/products/api/hooks";
+import LoadingSpinner from "../shared/components/LoadingSpinner";
 
-const tags = ["Birthday", "Anniversary", "Self-care", "Corporate", "Healing", "New baby", "Graduation"];
+const tags = [
+  { label: "Birthday", slug: "birthday-gifts" },
+  { label: "Curated boxes", slug: "gift-boxes" },
+  { label: "Self-care", slug: "self-care" },
+  { label: "Corporate", slug: "corporate-gifting" },
+  { label: "Encouragement", slug: "faith-encouragement" },
+  { label: "Personalized", slug: "personalized-gifts" },
+];
 
 const systemCards = [
   { icon: Gift, title: "Gift collection", text: "Personalized keepsakes, faith-infused collections, and timeless artistry." },
@@ -13,8 +24,11 @@ const systemCards = [
 ];
 
 const HomePage = () => {
+  const { data: featuredProducts = [], isLoading: featuredProductsLoading } = useFeaturedProducts();
+
   return (
     <div>
+      <Seo description="Discover intentional gift boxes, personalized keepsakes, self-care collections, faith gifts, and corporate gifting curated by DOXA Atelier." />
       <section className="mx-auto grid min-h-[calc(100vh-64px)] w-full max-w-7xl grid-cols-1 items-center gap-8 px-4 py-10 md:grid-cols-[1.05fr_0.95fr] md:px-8">
         <div className="space-y-6">
           <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-subtle)] bg-white/80 px-3 py-2 doxa-label text-[var(--primary)]">
@@ -42,8 +56,8 @@ const HomePage = () => {
           </div>
           <div className="flex flex-wrap gap-2 pt-2">
             {tags.map((tag) => (
-              <span key={tag} className="rounded-full bg-[var(--petal)] px-3 py-1.5 doxa-caption text-[var(--primary)]">
-                {tag}
+              <span key={tag.slug} className="rounded-full bg-[var(--petal)] px-3 py-1.5 doxa-caption text-[var(--primary)]">
+                {tag.label}
               </span>
             ))}
           </div>
@@ -67,11 +81,11 @@ const HomePage = () => {
         <div className="mx-auto flex max-w-7xl gap-3 overflow-x-auto px-4 md:px-8">
           {tags.map((tag) => (
             <Link
-              key={tag}
-              to={`/category/${tag.toLowerCase().replaceAll(" ", "-")}`}
+              key={tag.slug}
+              to={`/category/${tag.slug}`}
               className="shrink-0 rounded-full border border-[var(--border-subtle)] bg-white px-5 py-3 text-sm font-semibold text-[var(--text-primary)] transition hover:border-[var(--primary)] hover:text-[var(--primary)]"
             >
-              {tag}
+              {tag.label}
             </Link>
           ))}
         </div>
@@ -89,26 +103,13 @@ const HomePage = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {ProductData.slice(0, 3).map((product, index) => (
-            <article key={product.name} className="surface-card overflow-hidden rounded-xl">
-              <div className="relative">
-                <img src={product.imageUrl} alt={product.name} className="h-64 w-full object-cover" />
-                <span className="absolute left-3 top-3 rounded-full bg-white px-3 py-1 doxa-label text-[var(--primary)]">
-                  {index === 0 ? "New" : index === 1 ? "Classic" : "Premium"}
-                </span>
-              </div>
-              <div className="space-y-3 p-4">
-                <div>
-                  <h3 className="doxa-h1 text-[var(--text-primary)]">{product.name}</h3>
-                  <p className="doxa-caption text-[var(--text-secondary)]">{product.desc}</p>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-lg font-semibold text-[var(--primary)]">${product.amount} CAD</p>
-                  <button className="brand-button min-h-10 px-4">Add</button>
-                </div>
-              </div>
-            </article>
-          ))}
+          {featuredProductsLoading ? (
+            <div className="col-span-full"><LoadingSpinner /></div>
+          ) : featuredProducts.length > 0 ? (
+            featuredProducts.slice(0, 3).map((product) => <ProductCard key={product._id} product={product} />)
+          ) : (
+            <div className="surface-card col-span-full rounded-xl p-8 text-center text-sm text-[var(--text-secondary)]">No featured gifts are available right now.</div>
+          )}
         </div>
       </section>
 
@@ -142,7 +143,7 @@ const HomePage = () => {
           <p className="doxa-label text-[var(--primary)]">Occasions</p>
           <h2 className="mt-2 text-3xl font-medium text-[var(--text-primary)]">Shop by moment</h2>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {categoriesData.map((category) => (
             <Link key={category.name} to={"/category" + category.href} className="group relative h-80 overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-white">
               <img src={category.imageUrl} alt={category.name} className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105" />

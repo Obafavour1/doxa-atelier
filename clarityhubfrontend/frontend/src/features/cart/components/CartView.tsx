@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ShoppingCart } from "lucide-react";
+import { ArrowRight, Gift, ShoppingBag, Sparkles } from "lucide-react";
 import { useCart } from "../api/hooks";
 import CartItem from "./CartItem";
 import CartSummary from "./CartSummary";
@@ -8,21 +8,20 @@ import LoadingSpinner from "../../../shared/components/LoadingSpinner";
 
 const EmptyCartUI = () => (
   <motion.div
-    className="flex flex-col items-center justify-center space-y-4 py-16"
-    initial={{ opacity: 0, scale: 0.5 }}
-    animate={{ opacity: 1, scale: 1 }}
+    className="surface-card mx-auto flex max-w-3xl flex-col items-center rounded-xl px-6 py-16 text-center md:py-20"
+    initial={{ opacity: 0, y: 18 }}
+    animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5 }}
   >
-    <ShoppingCart className="h-24 w-24 text-gray-300" />
-    <h3 className="text-2xl font-semibold ">Your cart is empty</h3>
-    <p className="text-gray-400">
-      Looks like you {"haven't"} added anything to your cart yet.
-    </p>
+    <div className="relative mb-6"><span className="grid h-20 w-20 place-items-center rounded-full bg-[var(--primary-muted)] text-[var(--primary)]"><ShoppingBag size={32} /></span><Sparkles className="absolute -right-2 -top-1 text-[var(--primary)]" size={19} /></div>
+    <p className="doxa-label text-[var(--primary)]">Your gift bag</p>
+    <h3 className="mt-2 text-3xl font-medium text-[var(--text-primary)]">There’s room for something thoughtful.</h3>
+    <p className="mt-3 max-w-md text-sm leading-6 text-[var(--text-secondary)]">Explore curated boxes made for celebration, care, encouragement, and all the people who matter.</p>
     <Link
       to="/"
-      className="mt-4 rounded-md bg-rose-500 px-6 py-2 text-white transition-colors hover:bg-rose-600"
+      className="brand-button mt-7"
     >
-      Start Shopping
+      <Gift size={17} /> Explore gift collections <ArrowRight size={16} />
     </Link>
   </motion.div>
 );
@@ -33,11 +32,11 @@ const CartView = () => {
   if (isLoading) return <LoadingSpinner />;
 
   return (
-    <div className="py-8 md:py-16">
-      <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
-        <div className="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
+    <div className="py-8 md:py-10">
+      <div className="mx-auto max-w-7xl px-4 md:px-8">
+        <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start xl:gap-10">
           <motion.div
-            className="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl"
+            className="w-full"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -45,7 +44,8 @@ const CartView = () => {
             {cart.length === 0 ? (
               <EmptyCartUI />
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-end justify-between gap-4"><div><p className="doxa-label text-[var(--primary)]">Selected gifts</p><h2 className="mt-1 text-2xl font-medium text-[var(--text-primary)]">Your gift bag</h2></div><span className="rounded-full bg-[var(--petal)] px-3 py-1.5 text-xs font-semibold text-[var(--primary)]">{cart.length} {cart.length === 1 ? "item" : "items"}</span></div>
                 {cart.map((item) => (
                   <CartItem key={item._id} item={item} />
                 ))}
@@ -55,7 +55,7 @@ const CartView = () => {
 
           {cart.length > 0 && (
             <motion.div
-              className="mx-auto mt-6 max-w-4xl flex-1 space-y-6 lg:mt-0 lg:w-full"
+              className="w-full lg:sticky lg:top-24"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}

@@ -1,4 +1,4 @@
-# Clarity Store API Testing Guide
+# DOXA Atelier API Testing Guide
 
 ## 🧪 Testing Philosophy
 We utilize **Integration Testing** for the API layer to ensure the interaction between Routes, Controllers, Services, and the Database (MongoDB + Redis) is correct.
