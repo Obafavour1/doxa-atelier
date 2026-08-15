@@ -105,9 +105,12 @@ export const useCheckoutSuccess = () => {
   return useMutation({
     mutationFn: (payment: { provider: "stripe" | "paystack"; reference: string }) =>
       cartApi.checkoutSuccess(payment).then((res) => res.data.data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: cartKeys.items() });
+    onSuccess: (result) => {
+      if (!result.alreadyProcessed) {
+        qc.setQueryData<CartItem[]>(cartKeys.items(), []);
+      }
       qc.invalidateQueries({ queryKey: cartKeys.coupon() });
+      qc.invalidateQueries({ queryKey: ["orders", "mine"] });
     },
   });
 };

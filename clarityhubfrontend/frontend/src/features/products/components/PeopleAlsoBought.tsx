@@ -31,7 +31,7 @@ const PeopleAlsoBought = () => {
     fetchRecommendations();
   }, []);
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading) return <LoadingSpinner label="Finding thoughtful pairings" compact />;
 
   return (
     <div className="mt-8">

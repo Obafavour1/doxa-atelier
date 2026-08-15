@@ -14,6 +14,7 @@ import { useAddToCart } from "../features/cart/api/hooks";
 import type { Product } from "../types/api";
 import { toast } from "react-hot-toast";
 import Seo from "../shared/components/Seo";
+import LoadingSpinner from "../shared/components/LoadingSpinner";
 
 const ProductDetailPage = () => {
   const { slug } = useParams();
@@ -52,7 +53,7 @@ const ProductDetailPage = () => {
     }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  if (loading) return <LoadingSpinner label="Unwrapping this gift" />;
   if (!product) return <div className="min-h-screen flex flex-col items-center justify-center gap-4">
     <h1 className="text-2xl font-bold">Product not found</h1>
     <Link to="/" className="text-rose-500 hover:underline">Back to Shop</Link>

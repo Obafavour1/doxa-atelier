@@ -7,6 +7,7 @@ import { StoreLayout } from "./layout/StoreLayout";
 
 // Types
 import { useMe } from "./features/auth/api/hooks/hooks";
+import LoadingSpinner from "./shared/components/LoadingSpinner";
 import Seo from "./shared/components/Seo";
 
 // Store Pages
@@ -39,12 +40,12 @@ const RouteSeo = () => {
 const App = () => {
   const { data: user, isLoading } = useMe();
 
-  if (isLoading) return <div className="min-h-screen bg-[#050505] flex items-center justify-center text-white">Loading...</div>;
+  if (isLoading) return <LoadingSpinner label="Opening your DOXA experience" />;
 
   return (
     <>
       <RouteSeo />
-      <Suspense fallback={<div className="min-h-screen bg-[#050505] flex items-center justify-center text-white">Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner label="Preparing this page" />}>
         <Routes>
           {/* Store Routes */}
           <Route element={<StoreLayout />}>

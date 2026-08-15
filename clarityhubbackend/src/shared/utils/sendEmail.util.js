@@ -15,11 +15,15 @@ export const sendEmail = async ({ email, subject, message }) => {
   }
 
   const brevo = new BrevoClient({ apiKey });
+  const isPasswordReset = subject === "Password Reset Request";
   const result = await brevo.transactionalEmails.sendTransacEmail({
     sender: { email: senderEmail, name: senderName },
     to: [{ email }],
     subject,
     htmlContent: message,
+    ...(isPasswordReset
+      ? { headers: { "X-Mailin-Track-Clicks": "false" } }
+      : {}),
   });
 
   console.log(`Email sent successfully to ${email}`);

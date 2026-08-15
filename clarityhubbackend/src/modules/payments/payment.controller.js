@@ -7,7 +7,11 @@ import { env } from "../../config/env.config.js";
 import Coupon from "../../database/models/coupon.model.js";
 import Order from "../../database/models/order.model.js";
 import Product from "../../database/models/product.model.js";
+import User from "../../database/models/user.model.js";
 import * as paymentService from "./payment.service.js";
+
+const clearUserCart = (userId) =>
+  User.updateOne({ _id: userId }, { $set: { cartItems: [] } });
 
 const resolveCheckoutProducts = async (products) => {
   const requestedProducts = products.map((product) => ({
@@ -133,9 +137,14 @@ export const checkoutSuccess = asyncHandler(async (req, res) => {
 
   const session = await stripe.checkout.sessions.retrieve(sessionId);
   if (session.payment_status !== "paid") throw new ErrorHandler("Payment not completed", 400);
+  if (session.metadata?.userId !== req.user._id.toString()) {
+    throw new ErrorHandler("Payment does not belong to this user", 403);
+  }
 
   const existingOrder = await Order.findOne({ stripeSessionId: sessionId });
-  if (existingOrder) return successResponse(res, "Order already processed", { orderId: existingOrder._id });
+  if (existingOrder) {
+    return successResponse(res, "Order already processed", { orderId: existingOrder._id, alreadyProcessed: true });
+  }
 
   if (session.metadata?.couponCode) {
     const coupon = await Coupon.findOne({ code: session.metadata.couponCode.toUpperCase(), isActive: true });
@@ -147,7 +156,7 @@ export const checkoutSuccess = asyncHandler(async (req, res) => {
 
   const products = JSON.parse(session.metadata.products || "[]");
   const newOrder = await Order.create({
-    user: session.metadata.userId,
+    user: req.user._id,
     products: products.map((p) => ({ product: p.id, quantity: p.qty, price: Math.round(p.price * 100) })),
     totalAmount: session.amount_total,
     stripeSessionId: sessionId,
@@ -155,6 +164,8 @@ export const checkoutSuccess = asyncHandler(async (req, res) => {
     paymentStatus: "paid",
     status: "processing",
   });
+
+  await clearUserCart(req.user._id);
 
   return successResponse(res, "Payment successful, order created", { orderId: newOrder._id });
 });
@@ -295,5 +306,6 @@ export const verifyPaystackTransaction = asyncHandler(async (req, res) => {
   }
 
   if (expectedSubtotal >= 200) await paymentService.createNewRewardCoupon(req.user._id);
+  await clearUserCart(req.user._id);
   return successResponse(res, "Payment successful, order created", { orderId: newOrder._id });
 });

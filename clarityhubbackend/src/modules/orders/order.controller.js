@@ -105,6 +105,8 @@ export const exportOrders = asyncHandler(async (req, res) => {
 // --- User Controllers ---
 
 export const getMyOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({ user: req.user._id }).populate("products.product", "name image price");
+  const orders = await Order.find({ user: req.user._id })
+    .populate("products.product", "name image price slug")
+    .sort("-createdAt");
   return successResponse(res, "My orders fetched", { orders, count: orders.length });
 });

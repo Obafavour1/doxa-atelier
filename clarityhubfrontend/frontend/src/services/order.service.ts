@@ -4,11 +4,13 @@ import type { Order } from "../types/api";
 export const orderService = {
   getMyOrders: async (): Promise<Order[]> => {
     const response = await axiosInstance.get("/orders/my-orders");
-    return response.data.data?.orders || response.data.orders || response.data.data || response.data || [];
+    const orders = response.data?.data?.orders ?? response.data?.orders;
+    return Array.isArray(orders) ? orders : [];
   },
   getAll: async (): Promise<Order[]> => {
     const response = await axiosInstance.get("/orders");
-    return response.data.data?.orders || response.data.orders || response.data.data || response.data || [];
+    const orders = response.data?.data?.orders ?? response.data?.orders;
+    return Array.isArray(orders) ? orders : [];
   },
   getById: async (id: string): Promise<Order> => {
     const response = await axiosInstance.get(`/orders/${id}`);
@@ -33,7 +35,10 @@ export const orderService = {
 };
 
 export const paymentService = {
-  createCheckoutSession: async (data: { products: any[]; couponCode?: string }) => {
+  createCheckoutSession: async (data: {
+    products: Array<{ productId: string; quantity: number }>;
+    couponCode?: string;
+  }) => {
     const response = await axiosInstance.post("/payments/create-checkout-session", data);
     return response.data;
   },

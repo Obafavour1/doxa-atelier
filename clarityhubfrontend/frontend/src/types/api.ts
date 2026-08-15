@@ -44,19 +44,29 @@ export interface Cart {
 }
 
 export interface Order {
-  id: string;
-  user: User;
-  items: Array<{
-    product: Product;
+  _id: string;
+  id?: string;
+  user: User | string;
+  products: Array<{
+    product: Product | null;
     quantity: number;
     price: number;
   }>;
   totalAmount: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  trackingNumber?: string;
-  carrier?: string;
-  discountAmount: number;
-  couponCode?: string;
+  paymentAmount?: number;
+  paymentCurrency?: string;
+  paymentMethod?: 'stripe' | 'paystack';
+  paymentStatus?: 'pending' | 'paid' | 'failed' | 'refunded';
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'returned';
+  shippingDetails?: {
+    trackingNumber?: string;
+    carrier?: string;
+  };
+  timeline?: Array<{
+    status: string;
+    message?: string;
+    timestamp: string;
+  }>;
   createdAt: string;
   updatedAt: string;
 }
@@ -76,7 +86,7 @@ export interface AnalyticsData {
   revenue: number;
   salesGrowth: number;
   revenueGrowth: number;
-  chartData: any[];
+  chartData: unknown[];
 }
 
 export interface StoreSettings {

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { Outlet } from "react-router-dom";
 import { Navbar } from "./Navbar";
 import Footer from "./Footer";
+import LoadingSpinner from "../shared/components/LoadingSpinner";
 
 export const StoreLayout = () => {
   return (
@@ -10,7 +11,7 @@ export const StoreLayout = () => {
         <Navbar />
 
         <main className="grow pt-[72px]">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+          <Suspense fallback={<LoadingSpinner label="Preparing this page" />}>
             <Outlet />
           </Suspense>
         </main>

@@ -95,7 +95,7 @@ export const generateResetEmailTemplate = (url) => `
       <h2 style="color: #160812; text-align: center;">Reset your password</h2>
       <p style="font-size: 16px; color: #6f5864;">Use the button below to choose a new password for your DOXA Atelier account.</p>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${url}" style="background-color: #941a45; color: white; padding: 12px 24px; text-decoration: none; border-radius: 100px; font-weight: bold;">Reset password</a>
+        <a href="${url}" target="_blank" rel="noopener noreferrer" style="background-color: #941a45; color: white; padding: 12px 24px; text-decoration: none; border-radius: 100px; font-weight: bold;">Reset password</a>
       </div>
       <p style="font-size: 12px; color: #9b7b8b;">If the button does not work, copy and paste this link: ${url}</p>
     </div>
